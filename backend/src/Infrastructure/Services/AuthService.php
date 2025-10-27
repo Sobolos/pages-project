@@ -75,6 +75,10 @@ class AuthService
     {
         try {
             $decoded = $this->decodeJwt($token);
+            if (isset($decoded['exp']) && $decoded['exp'] < time()) {
+                return null; // Токен истёк
+            }
+
             return (int)$decoded['sub'] ?? null;
         } catch (\Exception $e) {
             return null;
