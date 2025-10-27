@@ -2,7 +2,7 @@
 
 namespace App\Application\Queries;
 
-use App\Infrastructure\Repositories\Interfaces\ShelfRepositoryInterface;
+use App\Domain\Interfaces\Repositories\ShelfRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoShelfRepository;
 
 class GetShelvesQuery

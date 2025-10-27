@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\Author;
+use App\Domain\Interfaces\Repositories\AuthorRepositoryInterface;
 use App\Infrastructure\Mappers\AuthorMapper;
-use App\Infrastructure\Repositories\Interfaces\AuthorRepositoryInterface;
 
 class PdoAuthorRepository extends PdoRepository implements AuthorRepositoryInterface
 {

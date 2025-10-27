@@ -1,7 +1,7 @@
 <?php
 namespace App\Application\Commands\Books;
 
-use App\Infrastructure\Repositories\Interfaces\BookRepositoryInterface;
+use App\Domain\Interfaces\Repositories\BookRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoBookRepository;
 
 class DeleteBookCommand

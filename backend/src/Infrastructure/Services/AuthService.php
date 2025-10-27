@@ -6,12 +6,12 @@ use App\Application\Commands\Status\CreateStatusCommand;
 use App\Application\Dto\LoginDto;
 use App\Application\Dto\StatusDto;
 use App\Application\Dto\UserDto;
-use App\Domain\Entities\User;
-use App\Domain\ValueObjects\Color;
-use App\Infrastructure\Repositories\Interfaces\UserRepositoryInterface;
-use App\Infrastructure\Repositories\Pdo\PdoUserRepository;
-use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
 use App\Config\jwt;
+use App\Domain\Entities\User;
+use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
+use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
+use App\Domain\ValueObjects\Color;
+use App\Infrastructure\Repositories\Pdo\PdoUserRepository;
 
 class AuthService
 {

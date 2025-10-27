@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\Status;
+use App\Domain\Interfaces\Repositories\StatusRepositoryInterface;
 use App\Infrastructure\Mappers\StatusMapper;
-use App\Infrastructure\Repositories\Interfaces\StatusRepositoryInterface;
 
 class PdoStatusRepository extends PdoRepository implements StatusRepositoryInterface
 {

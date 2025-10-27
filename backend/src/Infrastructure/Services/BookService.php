@@ -5,9 +5,9 @@ namespace App\Infrastructure\Services;
 use App\Application\Dto\UpdateBookStatusDto;
 use App\Domain\Entities\Book;
 use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
+use App\Domain\Interfaces\Repositories\BookRepositoryInterface;
+use App\Domain\Interfaces\Repositories\StatusRepositoryInterface;
 use App\Domain\Interfaces\StorageServiceInterface;
-use App\Infrastructure\Repositories\Interfaces\BookRepositoryInterface;
-use App\Infrastructure\Repositories\Interfaces\StatusRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoBookRepository;
 use App\Infrastructure\Repositories\Pdo\PdoStatusRepository;
 

@@ -4,7 +4,7 @@ namespace App\Application\Commands\Shelf;
 
 use App\Application\Dto\ShelfDto;
 use App\Domain\Entities\Shelf;
-use App\Infrastructure\Repositories\Interfaces\ShelfRepositoryInterface;
+use App\Domain\Interfaces\Repositories\ShelfRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoShelfRepository;
 use App\Infrastructure\Services\Validator;
 

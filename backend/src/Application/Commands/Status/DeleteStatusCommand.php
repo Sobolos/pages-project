@@ -2,7 +2,7 @@
 
 namespace App\Application\Commands\Status;
 
-use App\Infrastructure\Repositories\Interfaces\StatusRepositoryInterface;
+use App\Domain\Interfaces\Repositories\StatusRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoStatusRepository;
 
 

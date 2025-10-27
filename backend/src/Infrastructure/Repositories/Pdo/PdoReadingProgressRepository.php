@@ -2,12 +2,9 @@
 
 namespace App\Infrastructure\Repositories\Pdo;
 
-use App\Domain\Entities\Author;
 use App\Domain\Entities\ReadingProgress;
-use App\Infrastructure\Mappers\AuthorMapper;
+use App\Domain\Interfaces\Repositories\ReadingProgressRepositoryInterface;
 use App\Infrastructure\Mappers\ReadingProgressMapper;
-use App\Infrastructure\Repositories\Interfaces\AuthorRepositoryInterface;
-use App\Infrastructure\Repositories\Interfaces\ReadingProgressRepositoryInterface;
 
 class PdoReadingProgressRepository extends PdoRepository implements ReadingProgressRepositoryInterface
 {

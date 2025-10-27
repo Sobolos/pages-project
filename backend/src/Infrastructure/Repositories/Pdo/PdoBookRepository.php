@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\Book;
+use App\Domain\Interfaces\Repositories\BookRepositoryInterface;
 use App\Infrastructure\Mappers\BookMapper;
-use App\Infrastructure\Repositories\Interfaces\BookRepositoryInterface;
 
 class PdoBookRepository extends PdoRepository implements BookRepositoryInterface
 {

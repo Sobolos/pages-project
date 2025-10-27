@@ -1,8 +1,8 @@
 <?php
 namespace App\Domain\Entities;
 
+use App\Domain\Interfaces\Repositories\AuthorRepositoryInterface;
 use App\Domain\ValueObjects\Rating;
-use App\Infrastructure\Repositories\Interfaces\AuthorRepositoryInterface;
 
 class Book
 {

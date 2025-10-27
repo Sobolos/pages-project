@@ -1,7 +1,7 @@
 <?php
 namespace App\Application\Queries;
 
-use App\Infrastructure\Repositories\Interfaces\QuoteRepositoryInterface;
+use App\Domain\Interfaces\Repositories\QuoteRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoQuoteRepository;
 
 class GetQuotesQuery

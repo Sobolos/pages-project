@@ -2,7 +2,7 @@
 
 namespace App\Application\Commands\Author;
 
-use App\Infrastructure\Repositories\Interfaces\AuthorRepositoryInterface;
+use App\Domain\Interfaces\Repositories\AuthorRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoAuthorRepository;
 
 class DeleteAuthorCommand
