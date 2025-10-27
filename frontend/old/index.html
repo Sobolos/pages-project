@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Странички</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/old/css/style.css">
+</head>
+<body>
+<!-- Навигация -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">Странички</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <button class="btn btn-outline-danger" id="logoutBtn">Выйти</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Основа -->
+<div class="container mt-4">
+    <!-- Agile Доска -->
+    <h1 class="mb-4">Моя Agile Доска</h1>
+    <div id="loading_kanban" class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#bookModal">Добавить книгу</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#statusModal">Добавить статус</button>
+    </div>
+    <div class="kanban-board" id="kanbanBoard" style="display: none;"></div>
+
+    <!-- Список полок -->
+    <div>
+        <h1 class="mb-4">Мои полки</h1>
+        <div class="mb-3">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shelfModal">Добавить полку</button>
+        </div>
+        <!-- Вкладки для полок -->
+        <ul class="nav nav-tabs" id="shelfTabs" role="tablist">
+            <!-- Вкладки будут добавлены динамически через JS -->
+        </ul>
+        <!-- Контент вкладок -->
+        <div class="tab-content" id="shelfTabContent">
+            <!-- Контент будет добавлен динамически через JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Модальные окна -->
+<!-- Модальное окно для Shelf -->
+<div class="modal fade" id="shelfModal" tabindex="-1" aria-labelledby="shelfModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shelfModalLabel">Новая полка</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="shelfName" class="form-label">Название</label>
+                    <input type="text" class="form-control" id="shelfName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="shelfIconFile" class="form-label">Иконка (64x64)</label>
+                    <input type="file" class="form-control" id="shelfIconFile" accept="image/*">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveShelfBtn">Создать</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для Book -->
+<!-- Модальное окно для создания книги -->
+<div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookModalLabel">Новая книга</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="bookTitle" class="form-label">Название</label>
+                    <input type="text" class="form-control" id="bookTitle">
+                </div>
+                <div class="mb-3">
+                    <label for="bookAuthor" class="form-label">Авторы (через запятую)</label>
+                    <input type="text" class="form-control" id="bookAuthor" data-autocomplete="author">
+                    <div class="autocomplete-suggestions"></div>
+                    <div class="autocomplete-buttons mt-2">
+                        <button type="button" class="btn btn-primary btn-sm me-2">💾</button>
+                        <button type="button" class="btn btn-secondary btn-sm">✖</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="bookCoverFile" class="form-label">Обложка</label>
+                    <input type="file" class="form-control" id="bookCoverFile" accept="image/*">
+                </div>
+                <div class="mb-3">
+                    <label for="bookStatus" class="form-label">Статус</label>
+                    <select class="form-control" id="bookStatus"></select>
+                </div>
+                <div class="mb-3">
+                    <label for="bookShelf" class="form-label">Полка</label>
+                    <select class="form-control" id="bookShelf"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveBookBtn">Создать</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для Status -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel">Новый статус</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="statusName" class="form-label">Название</label>
+                    <input type="text" class="form-control" id="statusName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="statusColor" class="form-label">Цвет</label>
+                    <input type="color" class="form-control" id="statusColor" value="#000000">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveStatusBtn">Создать</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для просмотра и редактирования книги -->
+<div class="modal fade" id="bookViewModal" tabindex="-1" aria-labelledby="bookViewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookViewModalLabel">Карточка книги</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Левая часть: обложка или загрузка -->
+                    <div class="col-md-4" id="bookCoverContainer">
+                        <img src="" id="bookCover" class="img-fluid" alt="Обложка книги" style="display: none;">
+                        <div id="coverUploadContainer" style="display: none;">
+                            <label for="bookViewCoverFile" class="form-label">Загрузить обложку</label>
+                            <input type="file" class="form-control" id="bookViewCoverFile" accept="image/*">
+                        </div>
+                    </div>
+                    <!-- Правая часть: данные книги -->
+                    <div class="col-md-8">
+                        <dl class="row">
+                            <dt class="col-sm-3">Название</dt>
+                            <dd class="col-sm-9">
+                                <span id="bookViewTitle" contenteditable="true" data-field="title" data-original-value=""></span>
+                            </dd>
+                            <dt class="col-sm-3">Автор</dt>
+                            <dd class="col-sm-9 position-relative">
+                                <span id="bookViewAuthor" contenteditable="true" data-field="author" data-autocomplete="author" data-original-value=""></span>
+                                <div class="autocomplete-buttons">
+                                    <button class="btn btn-sm btn-primary" title="Сохранить">💾</button>
+                                    <button class="btn btn-sm btn-secondary" title="Отмена">✖</button>
+                                </div>
+                                <div class="autocomplete-suggestions"></div>
+                            </dd>
+                            <dt class="col-sm-3">Полка</dt>
+                            <dd class="col-sm-9 position-relative">
+                                <span id="bookViewShelf" contenteditable="true" data-field="shelf" data-autocomplete="shelf" data-original-value=""></span>
+                                <div class="autocomplete-buttons">
+                                    <button class="btn btn-sm btn-primary" title="Сохранить">💾</button>
+                                    <button class="btn btn-sm btn-secondary" title="Отмена">✖</button>
+                                </div>
+                                <div class="autocomplete-suggestions"></div>
+                            </dd>
+                            <dt class="col-sm-3">Статус</dt>
+                            <dd class="col-sm-9 position-relative">
+                                <span id="bookViewStatus" contenteditable="true" data-field="status" data-autocomplete="status" data-original-value=""></span>
+                                <div class="autocomplete-buttons">
+                                    <button class="btn btn-sm btn-primary" title="Сохранить">💾</button>
+                                    <button class="btn btn-sm btn-secondary" title="Отмена">✖</button>
+                                </div>
+                                <div class="autocomplete-suggestions"></div>
+                            </dd>
+                        </dl>
+
+                        <!-- Заметки -->
+                        <h5>Заметки</h5>
+                        <div id="notesList"></div>
+                        <div class="mb-3">
+                            <div class="container my-3">
+                                <div class="border rounded p-3">
+                                    <!-- Текстовая область для цитаты -->
+                                    <div class="mb-3">
+                                        <textarea class="form-control" id="newNote" rows="3" placeholder="Введите текст заметки"></textarea>
+                                    </div>
+
+                                    <!-- Нижний блок с инпутами и кнопкой добавить -->
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <button class="btn btn-outline-primary" id="addNoteBtn">
+                                            ➕ Добавить
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Цитаты -->
+                        <h5>Цитаты</h5>
+                        <div id="quotesList"></div>
+                        <div class="mb-3">
+                            <div class="container my-3">
+                                <div class="border rounded p-3">
+                                    <!-- Текстовая область для цитаты -->
+                                    <div class="mb-3">
+                                        <textarea class="form-control" id="newQuote" rows="3" placeholder="Введите текст цитаты"></textarea>
+                                    </div>
+
+                                    <!-- Нижний блок с инпутами и кнопкой добавить -->
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <input type="text" id="quotePage" name="quotePage" class="form-control mb-2 mb-md-0" placeholder="Страница" style="flex: 0 0 100px;">
+
+                                        <button class="btn btn-outline-primary" id="addQuoteBtn">
+                                            ➕ Добавить
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/old/js/request.js"></script>
+<script src="/old/js/agile.js"></script>
+<script src="/old/js/shelves.js"></script>
+<script src="/old/jsx.js"></script>
+<script src="/old/js/book.js"></script>
+<script src="/old/js/autocomplete.js"></script>
+
+</body>
+</html>

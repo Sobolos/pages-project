@@ -1,0 +1,291 @@
+/* Custom styles to complement Bootstrap 5 */
+
+/* Kanban Board */
+.kanban-board {
+    display: flex;
+    overflow-x: scroll;
+    height: 500px;
+    gap: 15px;
+    padding: 15px;
+}
+
+/* Kanban Columns */
+.kanban-column {
+    min-width: 250px;
+    max-width: 250px;
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: 0.375rem;
+    position: relative;
+    cursor: move;
+    box-shadow: 6px 6px 8px 0px rgba(34, 60, 80, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.kanban-column.dragging {
+    opacity: 0.5;
+}
+
+.kanban-column-title {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    box-shadow: 0px 0px 6px 5px rgb(34 60 80 / 29%);
+}
+
+.kanban-column-title h5 {
+    font-size: 1.2rem;
+}
+
+.dropzone-highlight {
+    background: #e0e0e0;
+    border: 2px dashed #0d6efd;
+}
+
+/* Kanban Cards */
+.kanban-card {
+    background: #ffffff;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    cursor: move;
+    transition: transform 0.2s ease;
+    box-shadow: 6px 6px 8px 0px rgba(34, 60, 80, 0.2);
+}
+
+.kanban-card:hover {
+    transform: scale(1.02);
+}
+
+.kanban-card img {
+    max-width: 50px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 0.25rem;
+}
+
+/* Shelf and Book Cards */
+.shelf-card,
+.book-card {
+    transition: transform 0.2s ease;
+}
+
+.shelf-card:hover,
+.book-card:hover {
+    transform: scale(1.05);
+}
+
+.shelf-icon {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 0.25rem;
+}
+
+.book-cover {
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 0.25rem;
+}
+
+/* Autocomplete Suggestions */
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1050;
+    background: #ffffff;
+    border: 2px solid #dee2e6;
+    border-radius: 0.25rem;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    list-style: none;
+    padding: 0;
+    min-width: 150px;
+    width: 100%;
+    display: none;
+}
+
+.autocomplete-suggestions.active {
+    display: block;
+}
+
+.list-group-item.suggestion-item {
+    padding: 8px;
+    cursor: pointer;
+    border: none;
+}
+
+.list-group-item.suggestion-item:hover {
+    background-color: #f8f9fa;
+}
+
+.autocomplete-buttons {
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.autocomplete-buttons.active {
+    display: inline-flex;
+}
+
+/* Contenteditable Styles */
+[contenteditable="true"] {
+    border: none;
+    background: none;
+    outline: none;
+    padding: 0;
+    display: inline;
+    cursor: text;
+}
+
+[contenteditable="true"]:focus {
+    border-bottom: 1px dashed #dee2e6;
+}
+
+/* Fade Animation */
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .kanban-board {
+        flex-direction: column;
+        overflow-x: hidden;
+    }
+
+    .kanban-column {
+        width: 100%;
+    }
+}
+
+/* Override Bootstrap modal overflow */
+.modal-content {
+    overflow: visible !important;
+}
+
+#book-detail-author:focus {
+    border: 2px solid red;
+}
+
+
+
+
+.custom-multiselect {
+    max-width: 100%; /* Адаптируется к ширине формы */
+}
+
+.select-display {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.select-display::after {
+    content: '\25BC'; /* Стрелка вниз */
+    font-size: 12px;
+}
+
+.dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.options-list .dropdown-item {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.options-list .dropdown-item input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.options-list .dropdown-item input[type="radio"] {
+    margin-right: 8px;
+}
+
+.options-list .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.selected-items {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.shelf-tabs {
+    position: relative;
+    border-bottom: none; /* Убираем нижнюю границу навбара */
+    overflow-y: hidden;
+}
+
+.shelf-tab-item {
+    margin-right: -15px; /* Перекрытие вкладок для эффекта "наезда" */
+    position: relative; /* Включаем позиционирование для z-index */
+    z-index: 1; /* Базовый z-index для неактивных вкладок */
+}
+
+.shelf-tab-item.active-tab {
+    z-index: 10; /* Активная вкладка выше всех */
+}
+
+.shelf-tab-item .nav-link {
+    position: relative;
+    padding: 0.5rem 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem 0.25rem 0 0;
+    border-bottom: none;
+    box-shadow: 4px 3px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-in-out;
+    transform: translateY(5px);
+}
+
+.shelf-tab-item.active-tab .shelf-nav-link.active {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    border-radius: 0.25rem 0.25rem 0 0;
+    box-shadow: 5px 3px 5px 0px rgba(0, 0, 0, 0.2);
+    transform: translateY(0px);
+}
+
+.nav-item .rename-shelf,
+.nav-item .delete-shelf {
+    display: none; /* Скрываем кнопки для неактивных вкладок */
+}
+
+.nav-item.active-tab .rename-shelf,
+.nav-item.active-tab .delete-shelf {
+    display: inline-block; /* Показываем кнопки только для активной вкладки */
+}
+
+.nav-item .btn {
+    font-size: 0.8rem; /* Компактные кнопки */
+}
+
+.tab-content {
+    margin-top: -1px; /* Устраняем зазор между вкладкой и контентом */
+    border: 1px solid #dee2e6;
+    border-radius: 0 0.25rem 0.25rem 0.25rem; /* Радиус только для нижних углов */
+    padding: 1rem;
+    background-color: #fff; /* Фон совпадает с активной вкладкой */
+    box-shadow: 2px 5px 4px rgba(0, 0, 0, 0.1); /* Тень для контента вкладок */
+}
+
+.add-diary-modal {
+    width: 580px;
+}

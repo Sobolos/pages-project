@@ -1,0 +1,225 @@
+.shelf-card {
+    transition: transform 0.2s;
+}
+
+.shelf-card:hover {
+    transform: scale(1.05);
+}
+
+.shelf-icon {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+}
+
+.kanban-board {
+    display: flex;
+    overflow-x: scroll;
+    height: 500px;
+    gap: 15px;
+    padding: 15px;
+}
+
+.kanban-column {
+    min-width: 250px;
+    background: #f4f4f4;
+    padding: 10px;
+    margin: 0 5px;
+    border-radius: 5px;
+    position: relative;
+    cursor: move;
+}
+
+.kanban-column.dragging {
+    opacity: 0.5;
+}
+
+.kanban-column-title {
+    background-color: #f8f9fa;
+    border-radius: 3px;
+}
+
+.dropzone-highlight {
+    background: #e0e0e0;
+    border: 2px dashed #007bff;
+}
+
+.drag-handle {
+    font-size: 16px;
+    text-align: center;
+    margin-right: 10px;
+    user-select: none;
+}
+
+.kanban-card {
+    background: #fff;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: move;
+}
+
+.kanban-card:hover {
+    transform: scale(1.02);
+}
+
+.kanban-card img {
+    max-width: 50px;
+    height: auto;
+}
+
+.suggestions {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.suggestion-item {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+.book-card {
+    transition: transform 0.2s;
+}
+
+.book-card:hover {
+    transform: scale(1.05);
+}
+
+.book-cover {
+    width: 100px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.tab-pane {
+    padding: 20px;
+}
+
+.tab-pane .row {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .kanban-board {
+        flex-direction: column;
+        overflow-x: hidden;
+    }
+
+    .kanban-column {
+        flex: 1 1 auto;
+        width: 100%;
+    }
+}
+
+[contenteditable="true"] {
+    border: none;
+    background: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    display: inline;
+    cursor: text;
+}
+
+[contenteditable="true"]:focus {
+    border-bottom: 1px dashed #ccc;
+}
+
+#coverUploadContainer {
+    padding: 10px;
+}
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.status-title {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.edit-status-btn, .delete-status-btn {
+    padding: 2px 8px;
+    font-size: 12px;
+    opacity: 0.5;
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: opacity 0.2s ease;
+}
+
+.edit-status-btn:hover, .delete-status-btn:hover {
+    opacity: 1;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-control[contenteditable] {
+    border: 1px solid #ced4da;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 9999;
+    background: #fff;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    list-style: none;
+    padding: 0;
+    min-width: 150px;
+    width: 100%;
+    display: none;
+}
+
+.autocomplete-suggestions.active {
+    display: block;
+}
+
+.list-group-item.suggestion-item {
+    padding: 8px;
+    cursor: pointer;
+    border: none;
+    list-style: none;
+}
+
+.list-group-item.suggestion-item:hover {
+    background-color: #f8f9fa;
+}
+
+.autocomplete-buttons {
+    display: none;
+}
+
+.autocomplete-buttons.active {
+    display: inline-flex;
+}
+
+.autocomplete-buttons .btn {
+    padding: 2px 8px;
+    font-size: 12px;
+}
+
+.modal-content {
+    overflow: visible !important;
+}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Странички - Вход</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="/js/api-client.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('login-form');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = form.querySelector('input[type="text"]').value;
+                const password = form.querySelector('input[type="password"]').value;
+                try {
+                    const response = await apiClient.login(email, password);
+                    alert('Успешный вход! User ID: ' + response.data.user_id);
+                    // Перенаправление или загрузка книг
+                    const books = await apiClient.getBooks();
+                    console.log('Books:', books);
+                } catch (error) {
+                    alert('Ошибка входа: ' + error.message);
+                }
+            });
+
+            const form1 = document.getElementById('register-form');
+            form1.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = form1.querySelector('input[type="text"]').value;
+                const email = form1.querySelector('input[type="email"]').value;
+                const password = form1.querySelector('input[type="password"]').value;
+                try {
+                    const response = await apiClient.register(username, email, password);
+                    alert('Успешный вход! User ID: ' + response.data.user_id);
+                    // Перенаправление или загрузка книг
+                    const books = await apiClient.getBooks();
+                    console.log('Books:', books);
+                } catch (error) {
+                    alert('Ошибка входа: ' + error.message);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Добро пожаловать в "Странички"</h1>
+    <p>Приложение для учёта книг и планов чтения.</p>
+    <div class="login">
+        <form id="login-form">
+            <input type="text" placeholder="username" required>
+            <input type="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+        </form>
+    </div>
+    <div class="register">
+        <form id="register-form">
+            <input type="email" placeholder="Email" id="email" required>
+            <input type="text" placeholder="username" id="username" required>
+            <input type="password" placeholder="Пароль" id="password" required>
+            <button type="submit">Регистрация</button>
+        </form>
+    </div>
+    <p><a href="profile.html">Профиль</a> | <a href="reader.html">Читалка</a></p>
+</div>
+</body>
+</html>

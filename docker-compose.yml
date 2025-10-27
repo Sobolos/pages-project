@@ -1,0 +1,51 @@
+x-project-name: stranichki-app
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend/public:/var/www/html/backend/public  # API endpoints
+      - ./frontend:/var/www/html/frontend             # Статические файлы frontend
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf  # Nginx config
+    depends_on:
+      - php-fpm
+    networks:
+      - app-network
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./backend:/var/www/html/backend  # Монтируем весь backend для dev
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=stranichki
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: stranichki
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"  # Для локального доступа psql
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistent БД
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

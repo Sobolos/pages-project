@@ -1,0 +1,5 @@
+.idea
+/backend/vendor/
+/backend/public/storage/covers/
+/backend/public/storage/epub/
+/backend/config/db.php

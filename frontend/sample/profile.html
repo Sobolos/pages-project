@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Странички - Профиль</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="/js/api-client.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const booksList = document.getElementById('books-list');
+            const statusesList = document.getElementById('statuses-list');
+            const shelvesList = document.getElementById('shelves-list');
+            const authorsList = document.getElementById('authors-list');
+            const historyList = document.getElementById('history-list');
+            const settingsForm = document.getElementById('settings-form');
+            const searchForm = document.getElementById('search-form');
+
+            // Получить ID текущего пользователя из токена
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const userId = payload.sub;
+
+            async function loadBooks(params = {}) {
+                try {
+                    const booksResponse = await apiClient.getBooks({ page: 1, per_page: 10, ...params });
+                    booksList.innerHTML = booksResponse.data.map(book => `
+                        <li>
+                            ${book.title} (Авторы: ${book.authors.map(a => a.name).join(', ') || 'Не указаны'})
+                            <a href="reader.html?book_id=${book.id}">Читать</a>
+                            <button onclick="editBook(${book.id}, '${book.title.replace(/'/g, "\\'")}', ${book.status_id}, ${book.rating}, ${book.shelf_id}, [${book.authors.map(a => a.id)}], '${book.cover_url || ''}', '${book.epub_url || ''}', ${book.physical_pages}, ${book.electronic_pages}, ${book.current_page})">Редактировать</button>
+                            <button onclick="deleteBook(${book.id})">Удалить</button>
+                        </li>
+                    `).join('');
+                } catch (error) {
+                    alert('Ошибка загрузки книг: ' + error.message);
+                }
+            }
+
+            async function loadHistory(params = {}) {
+                try {
+                    const profileResponse = await apiClient.getPublicProfile(userId, {
+                        page: 1,
+                        per_page: 10,
+                        historyEvents: ['book_created', 'progress_updated', 'note_created', 'quote_created'],
+                        ...params
+                    });
+                    historyList.innerHTML = profileResponse.data.history.map(entry => `
+                        <li>
+                            ${entry.message} (${entry.created_at})
+                        </li>
+                    `).join('');
+                } catch (error) {
+                    alert('Ошибка загрузки истории: ' + error.message);
+                }
+            }
+
+            async function loadSettings() {
+                try {
+                    const settingsResponse = await apiClient.getSettings();
+                    const settings = settingsResponse.data;
+                    document.getElementById('history_book_created').checked = settings.historyEvents.includes('book_created');
+                    document.getElementById('history_progress_updated').checked = settings.historyEvents.includes('progress_updated');
+                    document.getElementById('history_note_created').checked = settings.historyEvents.includes('note_created');
+                    document.getElementById('history_quote_created').checked = settings.historyEvents.includes('quote_created');
+                } catch (error) {
+                    alert('Ошибка загрузки настроек: ' + error.message);
+                }
+            }
+
+            try {
+                // Загрузить книги
+                await loadBooks();
+
+                // Загрузить историю
+                await loadHistory();
+
+                // Загрузить настройки
+                await loadSettings();
+
+                // Получить статусы
+                const statusesResponse = await apiClient.getStatuses();
+                statusesList.innerHTML = statusesResponse.data.map(status => `
+                    <li>
+                        ${status.name} (${status.color})
+                        <button onclick="editStatus(${status.id}, '${status.name.replace(/'/g, "\\'")}', '${status.color}', ${status.hide_from_agile}, ${status.position})">Редактировать</button>
+                        <button onclick="deleteStatus(${status.id})">Удалить</button>
+                    </li>
+                `).join('');
+
+                // Заполнить выпадающий список статусов
+                const statusSelect = document.getElementById('status_id');
+                statusSelect.innerHTML = '<option value="">Все статусы</option>' + statusesResponse.data.map(status => `
+                    <option value="${status.id}">${status.name}</option>
+                `).join('');
+
+                // Получить полки
+                const shelvesResponse = await apiClient.getShelves();
+                shelvesList.innerHTML = shelvesResponse.data.map(shelf => `
+                    <li>
+                        ${shelf.name}
+                        <button onclick="editShelf(${shelf.id}, '${shelf.name.replace(/'/g, "\\'")}')">Редактировать</button>
+                        <button onclick="deleteShelf(${shelf.id})">Удалить</button>
+                    </li>
+                `).join('');
+
+                // Заполнить выпадающий список полок
+                const shelfSelect = document.getElementById('shelf_id');
+                shelfSelect.innerHTML = '<option value="">Все полки</option>' + shelvesResponse.data.map(shelf => `
+                    <option value="${shelf.id}">${shelf.name}</option>
+                `).join('');
+
+                // Получить авторов
+                const authorsResponse = await apiClient.getAuthors();
+                authorsList.innerHTML = authorsResponse.data.map(author => `
+                    <li>
+                        ${author.name}
+                        <button onclick="editAuthor(${author.id}, '${author.name.replace(/'/g, "\\'")}')">Редактировать</button>
+                        <button onclick="deleteAuthor(${author.id})">Удалить</button>
+                    </li>
+                `).join('');
+
+            } catch (error) {
+                alert('Ошибка загрузки данных: ' + error.message);
+            }
+
+            // Форма поиска и фильтров
+            searchForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const params = {
+                    search: formData.get('search') || '',
+                    status_id: formData.get('status_id') ? parseInt(formData.get('status_id')) : undefined,
+                    shelf_id: formData.get('shelf_id') ? parseInt(formData.get('shelf_id')) : undefined,
+                };
+                await loadBooks(params);
+            });
+
+            // Форма настроек
+            settingsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const settingsData = {
+                    historyEvents: [
+                        formData.get('history_book_created') === 'on' ? 'book_created' : null,
+                        formData.get('history_progress_updated') === 'on' ? 'progress_updated' : null,
+                        formData.get('history_note_created') === 'on' ? 'note_created' : null,
+                        formData.get('history_quote_created') === 'on' ? 'quote_created' : null,
+                    ].filter(event => event !== null)
+                };
+                try {
+                    await apiClient.updateSettings(settingsData);
+                    alert('Настройки сохранены!');
+                    await loadHistory(); // Обновить историю после изменения настроек
+                } catch (error) {
+                    alert('Ошибка сохранения настроек: ' + error.message);
+                }
+            });
+
+            // Форма добавления книги
+            document.getElementById('book-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const bookData = {
+                    title: formData.get('title'),
+                    status_id: parseInt(formData.get('status_id')),
+                    rating: parseFloat(formData.get('rating')),
+                    shelf_id: parseInt(formData.get('shelf_id')),
+                    author_ids: formData.get('author_ids') ? formData.get('author_ids').split(',').map(id => parseInt(id)) : [],
+                    cover_url: formData.get('cover_url') || null,
+                    epub_url: formData.get('epub_url') || null,
+                    physical_pages: parseInt(formData.get('physical_pages')) || 0,
+                    electronic_pages: parseInt(formData.get('electronic_pages')) || 0,
+                };
+                try {
+                    await apiClient.createBook(bookData);
+                    alert('Книга добавлена!');
+                    window.location.reload();
+                } catch (error) {
+                    alert('Ошибка добавления книги: ' + error.message);
+                }
+            });
+
+            // Форма добавления статуса
+            document.getElementById('status-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const statusData = {
+                    name: formData.get('name'),
+                    color: formData.get('color'),
+                    hide_from_agile: formData.get('hide_from_agile') === 'on',
+                    position: parseInt(formData.get('position')) || 0,
+                };
+                try {
+                    await apiClient.createStatus(statusData);
+                    alert('Статус добавлен!');
+                    window.location.reload();
+                } catch (error) {
+                    alert('Ошибка добавления статуса: ' + error.message);
+                }
+            });
+
+            // Форма добавления полки
+            document.getElementById('shelf-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const shelfData = {
+                    name: formData.get('name'),
+                };
+                try {
+                    await apiClient.createShelf(shelfData);
+                    alert('Полка добавлена!');
+                    window.location.reload();
+                } catch (error) {
+                    alert('Ошибка добавления полки: ' + error.message);
+                }
+            });
+
+            // Форма добавления автора
+            document.getElementById('author-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const authorData = {
+                    name: formData.get('name'),
+                };
+                try {
+                    await apiClient.createAuthor(authorData);
+                    alert('Автор добавлен!');
+                    window.location.reload();
+                } catch (error) {
+                    alert('Ошибка добавления автора: ' + error.message);
+                }
+            });
+        });
+
+        async function editBook(id, title, statusId, rating, shelfId, authorIds, coverUrl, epubUrl, physicalPages, electronicPages, currentPage) {
+            const bookData = {
+                title: prompt('Название книги:', title) || title,
+                status_id: parseInt(prompt('ID статуса:', statusId)) || statusId,
+                rating: parseFloat(prompt('Рейтинг (0-5):', rating)) || rating,
+                shelf_id: parseInt(prompt('ID полки:', shelfId)) || shelfId,
+                author_ids: prompt('ID авторов (через запятую):', authorIds.join(','))?.split(',').map(id => parseInt(id)) || authorIds,
+                cover_url: prompt('URL обложки:', coverUrl) || coverUrl,
+                epub_url: prompt('URL EPUB:', epubUrl) || epubUrl,
+                physical_pages: parseInt(prompt('Физические страницы:', physicalPages)) || physicalPages,
+                electronic_pages: parseInt(prompt('Электронные страницы:', electronicPages)) || electronicPages,
+                current_page: parseInt(prompt('Текущая страница:', currentPage)) || currentPage,
+            };
+            try {
+                await apiClient.updateBook(id, bookData);
+                alert('Книга обновлена!');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка обновления книги: ' + error.message);
+            }
+        }
+
+        async function deleteBook(id) {
+            if (!confirm('Вы уверены, что хотите удалить книгу?')) {
+                return;
+            }
+            try {
+                await apiClient.deleteBook(id);
+                alert('Книга удалена!');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка удаления книги: ' + error.message);
+            }
+        }
+
+        async function editStatus(id, name, color, hideFromAgile, position) {
+            const statusData = {
+                name: prompt('Название статуса:', name) || name,
+                color: prompt('Цвет (HEX):', color) || color,
+                hide_from_agile: confirm('Скрыть из Agile?') ? true : hideFromAgile,
+                position: parseInt(prompt('Позиция:', position)) || position,
+            };
+            try {
+                await apiClient.updateStatus(id, statusData);
+                alert('Статус обновлён!');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка обновления статуса: ' + error.message);
+            }
+        }
+
+        async function deleteStatus(id) {
+            if (!confirm('Вы уверены, что хотите удалить статус?')) {
+                return;
+            }
+            try {
+                await apiClient.deleteStatus(id);
+                alert('Статус удалён!');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка удаления статуса: ' + error.message);
+            }
+        }
+
+        async function editShelf(id, name) {
+            const shelfData = {
+                name: prompt('Название полки:', name) || name,
+            };
+            try {
+                await apiClient.updateShelf(id, shelfData);
+                alert('Полка обновлена!');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка обновления полки: ' + error.message);
+            }
+        }
+
+        async function deleteShelf(id) {
+            if (!confirm('Вы уверены, что хотите удалить полку?')) {
+                return;
+            }
+            try {
+                await apiClient.deleteShelf(id);
+                alert('Полка удалена!');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка удаления полки: ' + error.message);
+            }
+        }
+
+        async function editAuthor(id, name) {
+            const authorData = {
+                name: prompt('Имя автора:', name) || name,
+            };
+            try {
+                await apiClient.updateAuthor(id, authorData);
+                alert('Автор обновлён!');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка обновления автора: ' + error.message);
+            }
+        }
+
+        async function deleteAuthor(id) {
+            if (!confirm('Вы уверены, что хотите удалить автора?')) {
+                return;
+            }
+            try {
+                await apiClient.deleteAuthor(id);
+                alert('Автор удалён!');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка удаления автора: ' + error.message);
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Профиль</h1>
+    <h2>Настройки</h2>
+    <form id="settings-form">
+        <label>
+            <input type="checkbox" name="history_book_created" id="history_book_created">
+            Показывать создание книг
+        </label>
+        <label>
+            <input type="checkbox" name="history_progress_updated" id="history_progress_updated">
+            Показывать обновление прогресса
+        </label>
+        <label>
+            <input type="checkbox" name="history_note_created" id="history_note_created">
+            Показывать создание заметок
+        </label>
+        <label>
+            <input type="checkbox" name="history_quote_created" id="history_quote_created">
+            Показывать создание цитат
+        </label>
+        <button type="submit">Сохранить настройки</button>
+    </form>
+    <h2>История</h2>
+    <ul id="history-list"></ul>
+    <h2>Поиск и фильтры</h2>
+    <form id="search-form">
+        <label>
+            Поиск по названию:
+            <input type="text" name="search">
+        </label>
+        <label>
+            Статус:
+            <select name="status_id" id="status_id">
+                <option value="">Все статусы</option>
+            </select>
+        </label>
+        <label>
+            Полка:
+            <select name="shelf_id" id="shelf_id">
+                <option value="">Все полки</option>
+            </select>
+        </label>
+        <button type="submit">Найти</button>
+    </form>
+    <h2>Книги</h2>
+    <form id="book-form">
+        <label>
+            Название:
+            <input type="text" name="title" required>
+        </label>
+        <label>
+            ID статуса:
+            <input type="number" name="status_id" required>
+        </label>
+        <label>
+            Рейтинг (0-5):
+            <input type="number" name="rating" step="0.1" min="0" max="5">
+        </label>
+        <label>
+            ID полки:
+            <input type="number" name="shelf_id" required>
+        </label>
+        <label>
+            ID авторов (через запятую):
+            <input type="text" name="author_ids">
+        </label>
+        <label>
+            URL обложки:
+            <input type="text" name="cover_url">
+        </label>
+        <label>
+            URL EPUB:
+            <input type="text" name="epub_url">
+        </label>
+        <label>
+            Физические страницы:
+            <input type="number" name="physical_pages" min="0">
+        </label>
+        <label>
+            Электронные страницы:
+            <input type="number" name="electronic_pages" min="0">
+        </label>
+        <button type="submit">Добавить книгу</button>
+    </form>
+    <ul id="books-list"></ul>
+    <h2>Статусы</h2>
+    <form id="status-form">
+        <label>
+            Название:
+            <input type="text" name="name" required>
+        </label>
+        <label>
+            Цвет (HEX):
+            <input type="text" name="color" value="#FFFFFF">
+        </label>
+        <label>
+            Скрыть из Agile:
+            <input type="checkbox" name="hide_from_agile">
+        </label>
+        <label>
+            Позиция:
+            <input type="number" name="position" min="0">
+        </label>
+        <button type="submit">Добавить статус</button>
+    </form>
+    <ul id="statuses-list"></ul>
+    <h2>Полки</h2>
+    <form id="shelf-form">
+        <label>
+            Название:
+            <input type="text" name="name" required>
+        </label>
+        <button type="submit">Добавить полку</button>
+    </form>
+    <ul id="shelves-list"></ul>
+    <h2>Авторы</h2>
+    <form id="author-form">
+        <label>
+            Имя:
+            <input type="text" name="name" required>
+        </label>
+        <button type="submit">Добавить автора</button>
+    </form>
+    <ul id="authors-list"></ul>
+    <a href="index.html">Выйти</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Странички - Читалка</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.338/pdf.min.js"></script>
+    <script src="/js/api-client.js" defer></script>
+    <script>
+        function debounce(func, delay) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), delay);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = parseInt(urlParams.get('book_id'));
+            if (!bookId) {
+                alert('ID книги не указан');
+                window.location.href = 'profile.html';
+                return;
+            }
+
+            // В начало скрипта добавляем дебонсированную функцию для обновления прогресса
+            const updateProgressDebounced = debounce(async (page) => {
+                const deviceType = window.innerWidth <= 600 ? 'mobile' : window.innerWidth <= 1024 ? 'tablet' : 'desktop';
+                try {
+                    const progressResponse = await apiClient.updateBookProgress(bookId, {
+                        book_id: bookId,
+                        current_page: page, // Используем current_page вместо cfi_page
+                        device_type: deviceType,
+                        is_electronic: true
+                    });
+                    progressBar.style.width = `${progressResponse.data.progress_percentage}%`;
+                    progressText.textContent = `Прогресс: ${progressResponse.data.progress_percentage}% (Страница ${progressResponse.data.current_page})`;
+                } catch (error) {
+                    console.error('Ошибка обновления прогресса:', error.message);
+                }
+            }, 500);
+
+            const bookInfo = document.getElementById('book-info');
+            const bookContainer = document.getElementById('book-container');
+            const notesList = document.getElementById('notes-list');
+            const quotesList = document.getElementById('quotes-list');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const syncForm = document.getElementById('sync-form');
+            const prevPage = document.getElementById('prev-page');
+            const nextPage = document.getElementById('next-page');
+
+            let book, rendition, currentPage = 0, totalPages = 0, format;
+
+            // В обработчиках кнопок
+            prevPage.addEventListener('click', async () => {
+                rendition.prev();
+                updateProgressDebounced(currentPage);
+            });
+
+            nextPage.addEventListener('click', async () => {
+                rendition.next();
+                updateProgressDebounced(currentPage);
+            });
+
+            async function loadBook() {
+                try {
+                    const response = await apiClient.getBooks({ book_id: bookId });
+                    const bookData = response.data[0];
+                    if (!bookData) {
+                        alert('Книга не найдена');
+                        return;
+                    }
+
+                    // Вывод информации о книге
+                    bookInfo.innerHTML = `
+                        <h2>${bookData.title}</h2>
+                        <p>Авторы: ${bookData.authors.map(a => a.name).join(', ') || 'Не указаны'}</p>
+                        <p>Рейтинг: ${bookData.rating.toFixed(1)}</p>
+                        <p>Статус ID: ${bookData.status_id}</p>
+                        <p>Полка ID: ${bookData.shelf_id}</p>
+                        <p>Физические страницы: ${bookData.physical_pages || 0}</p>
+                        <p>Электронные страницы: ${bookData.electronic_pages || 0}</p>
+                        <p>Текущая страница: ${bookData.current_page || 0}</p>
+                    `;
+
+                    format = bookData.epub_url ? 'epub' : bookData.pdf_url ? 'pdf' : 'unknown';
+
+                    if (format === 'epub') {
+                        book = ePub(bookData.epub_url);
+                        rendition = book.renderTo(bookContainer, {
+                            width: '100%',
+                            height: '600px',
+                            spread: 'auto',
+                            flow: 'paginated',
+                            sandbox: 'allow-scripts allow-same-origin'
+                        });
+                        await rendition.display();
+
+                        rendition.on('relocated', debounce(async (location) => {
+                            currentPage = location.start.displayed.page;
+                            totalPages = location.start.displayed.total;
+                            const deviceType = window.innerWidth <= 600 ? 'mobile' : window.innerWidth <= 1024 ? 'tablet' : 'desktop';
+
+                            try {
+                                const progressResponse = await apiClient.updateReadingProgress({
+                                    book_id: bookId,
+                                    cfi_page: currentPage,
+                                    device_type: deviceType,
+                                    is_electronic: true
+                                });
+
+                                document.getElementById('prev-page').addEventListener('click', () => rendition.prev());
+                                document.getElementById('next-page').addEventListener('click', () => rendition.next());
+
+                                progressBar.style.width = `${progressResponse.data.progress_percentage}%`;
+                                progressText.textContent = `Прогресс: ${progressResponse.data.progress_percentage}% (Страница ${progressResponse.data.current_page})`;
+
+                                // Загрузка цитат и заметок по странице
+                                const quotesResponse = await apiClient.getQuotes({ book_id: bookId, page_number: currentPage });
+                                quotesList.innerHTML = quotesResponse.data.map(quote => `
+                                    <li>
+                                        ${quote.content} (стр. ${quote.page_number})
+                                        <button onclick="updateQuote(${quote.id}, '${quote.content.replace(/'/g, "\\'")}', ${quote.page_number})">Редактировать</button>
+                                        <button onclick="deleteQuote(${quote.id})">Удалить</button>
+                                    </li>
+                                `).join('');
+
+                                const notesResponse = await apiClient.getNotes({ book_id: bookId });
+                                notesList.innerHTML = notesResponse.data.map(note => `
+                                    <li>
+                                        ${note.content}
+                                        <button onclick="updateNote(${note.id}, '${note.content.replace(/'/g, "\\'")}')">Редактировать</button>
+                                        <button onclick="deleteNote(${note.id})">Удалить</button>
+                                    </li>
+                                `).join('');
+
+                                if (progressResponse.data.progress_percentage >= 100) {
+                                    const statusResponse = await apiClient.suggestStatusChange(bookId);
+                                    if (statusResponse.data.status_id) {
+                                        alert(`Книга дочитана! Статус изменён на "${statusResponse.data.status_name}"`);
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('Ошибка обновления прогресса:', error.message);
+                            }
+                        }, 500)); // Debounce 500ms
+                    } else if (format === 'pdf') {
+                        pdfjsLib.getDocument(bookData.pdf_url).promise.then(pdf => {
+                            totalPages = pdf.numPages;
+                            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                                pdf.getPage(pageNum).then(page => {
+                                    const viewport = page.getViewport({ scale: 1 });
+                                    const canvas = document.createElement('canvas');
+                                    canvas.height = viewport.height;
+                                    canvas.width = viewport.width;
+                                    bookContainer.appendChild(canvas);
+                                    page.render({ canvasContext: canvas.getContext('2d'), viewport });
+                                });
+                            }
+                        });
+                    } else {
+                        alert('Формат книги не поддерживается');
+                    }
+
+                    // Загрузка текущего прогресса
+                    const progressResponse = await apiClient.getReadingProgress(bookId);
+                    progressBar.style.width = `${progressResponse.data.progress_percentage}%`;
+                    progressText.textContent = `Прогресс: ${progressResponse.data.progress_percentage}% (Страница ${progressResponse.data.current_page})`;
+                } catch (error) {
+                    alert('Ошибка загрузки книги: ' + error.message);
+                }
+            }
+
+            // Синхронизация с бумажной версией
+            syncForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const paperSyncOffset = parseInt(formData.get('paper_page'));
+                const deviceType = window.innerWidth <= 600 ? 'mobile' : window.innerWidth <= 1024 ? 'tablet' : 'desktop';
+
+                try {
+                    const response = await apiClient.syncPaperProgress(bookId, paperSyncOffset, deviceType);
+                    progressBar.style.width = `${response.data.progress_percentage}%`;
+                    progressText.textContent = `Прогресс: ${response.data.progress_percentage}% (Страница ${response.data.current_page})`;
+
+                    // Отобразить соответствующую страницу в электронной версии
+                    if (format === 'epub') {
+                        const cfi = response.data.current_page / book.spine.length;
+                        rendition.display(cfi);
+                    }
+
+                    alert('Прогресс синхронизирован с бумажной версией');
+                } catch (error) {
+                    alert('Ошибка синхронизации: ' + error.message);
+                }
+            });
+
+            // Навигация
+            prevPage.addEventListener('click', () => rendition.prev());
+            nextPage.addEventListener('click', () => rendition.next());
+
+            await loadBook();
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Читалка</h1>
+    <div id="book-info"></div>
+    <div id="book-container"></div>
+    <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+    </div>
+    <p id="progress-text">Прогресс: 0% (Страница 0)</p>
+    <button id="prev-page">Предыдущая</button>
+    <button id="next-page">Следующая</button>
+
+    <form id="sync-form">
+        <label>
+            Синхронизировать с бумажной версией (страница):
+            <input type="number" name="paper_page" min="0" required>
+        </label>
+        <button type="submit">Синхронизировать</button>
+    </form>
+    <h2>Цитаты на текущей странице</h2>
+    <ul id="quotes-list"></ul>
+    <h2>Заметки на текущей странице</h2>
+    <ul id="notes-list"></ul>
+    <a href="profile.html">Вернуться в профиль</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя Agile Доска</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Header Section -->
+<header class="site-header">
+    <nav class="navbar navbar-expand navbar-light">
+        <div class="container-fluid">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/" aria-current="page">Странички</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/diary.html" aria-current="page">Дневник</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link nav-link--logout" href="#">Выйти</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<!-- Main Content -->
+<main class="container main-content">
+    <div class="row">
+        <div class="col-6">
+            <h1 class="main-title my-4">Моя Доска</h1>
+        </div>
+        <div class="col-6">
+            <div class="d-flex justify-content-end my-4">
+                <!-- Quick Actions -->
+                <section class="quick-actions mb-4" aria-label="Быстрые действия">
+                    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-action="add-diary" data-bs-target="#add-diary-modal">Запись в дневник</button>
+                    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-action="add-book" data-bs-target="#add-book-modal">Добавить книгу</button>
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-action="add-status" data-bs-target="#add-status-modal">Добавить статус</button>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div class="loading text-center" aria-live="polite" style="display: none;" id="loading_kanban">
+        <p>Загрузка...</p>
+    </div>
+
+    <div class="kanban-board" id="kanbanBoard" style="display: none;"></div>
+
+    <!-- Список полок -->
+    <div>
+        <div class="title d-flex justify-content-end row mb-4" style="margin-top: 75px">
+
+            <h1 class="col-6">
+                Мои полки
+            </h1>
+
+            <div class="col-6 d-flex justify-content-end ">
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#add-shelf-modal">Добавить полку</button>
+            </div>
+        </div>
+
+        <div>
+            <!-- Вкладки для полок -->
+            <ul class="nav nav-tabs shelf-tabs" id="shelfTabs" role="tablist">
+                <!-- Вкладки будут добавлены динамически через JS -->
+            </ul>
+        </div>
+
+        <!-- Контент вкладок -->
+        <div class="tab-content" id="shelfTabContent">
+            <!-- Контент будет добавлен динамически через JS -->
+        </div>
+    </div>
+</main>
+
+<!-- Modal: Add New Shelf -->
+<div class="modal fade" id="add-shelf-modal" tabindex="-1" aria-labelledby="add-shelf-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="add-shelf-modal-label">Новая полка</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form id="add-shelf-form" class="modal-body">
+                <div class="mb-3">
+                    <label for="shelf-name" class="form-label">Название</label>
+                    <input type="text" class="form-control" id="shelf-name" name="shelf-name" required>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" id="saveShelfBtn">Создать</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для переименования полки -->
+<div class="modal fade" id="renameShelfModal" tabindex="-1" aria-labelledby="renameShelfModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renameShelfModalLabel">Переименовать полку</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rename-shelf-form">
+                    <div class="mb-3">
+                        <label for="rename-shelf-name" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="rename-shelf-name" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add New Book -->
+<div class="modal fade" id="add-book-modal" tabindex="-1" aria-labelledby="add-book-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="add-book-modal-label">Новая книга</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form id="add-book-form" class="modal-body">
+                <div class="mb-3">
+                    <label for="book-title" class="form-label">Название</label>
+                    <input type="text" class="form-control" id="book-title" name="book-title" required>
+                </div>
+                <div class="mb-3">
+                    <label for="book-authors" class="form-label">Авторы</label>
+                    <div class="custom-multiselect position-relative" id="book-authors-add">
+                        <div class="form-control select-display" id="authorSelectDisplayAdd" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="selected-items">Выберите авторов...</span>
+                        </div>
+                        <div class="dropdown-menu w-100" id="authorDropdownMenuAdd">
+                            <div class="px-2 mb-2">
+                                <input type="text" class="form-control" id="authorSearchInputAdd" placeholder="Поиск...">
+                            </div>
+                            <div class="options-list" id="authorOptionsListAdd"></div>
+                        </div>
+                        <input type="hidden" name="selectedAuthors" id="selectedAuthorsAdd">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="book-cover" class="form-label">Обложка</label>
+                    <input type="file" class="form-control" id="book-cover" name="book-cover" accept="image/png,image/jpeg">
+                </div>
+                <div class="mb-3">
+                    <label for="book-shelves" class="form-label">Полка</label>
+                    <div class="custom-multiselect position-relative" id="book-shelves-add">
+                        <div class="form-control select-display" id="shelfSelectDisplayAdd" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="selected-items">Выберите полку...</span>
+                        </div>
+                        <div class="dropdown-menu w-100" id="shelfDropdownMenuAdd">
+                            <div class="px-2 mb-2">
+                                <input type="text" class="form-control" id="shelfSearchInputAdd" placeholder="Поиск...">
+                            </div>
+                            <div class="options-list" id="shelfOptionsListAdd"></div>
+                        </div>
+                        <input type="hidden" name="selectedShelf" id="selectedShelfAdd">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="book-statuses" class="form-label">Статусы</label>
+                    <div class="custom-multiselect position-relative" id="book-statuses-add">
+                        <div class="form-control select-display" id="statusSelectDisplayAdd" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="selected-items">Выберите статус...</span>
+                        </div>
+                        <div class="dropdown-menu w-100" id="statusDropdownMenuAdd">
+                            <div class="px-2 mb-2">
+                                <input type="text" class="form-control" id="statusSearchInputAdd" placeholder="Поиск...">
+                            </div>
+                            <div class="options-list" id="statusOptionsListAdd"></div>
+                        </div>
+                        <input type="hidden" name="selectedStatus" id="selectedStatusAdd">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="saveBookBtn">Создать</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add New Status -->
+<div class="modal fade" id="add-status-modal" tabindex="-1" aria-labelledby="add-status-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="add-status-modal-label">Новый статус</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form id="add-status-form" class="modal-body">
+                <div class="row">
+                    <div class="mb-3 col-10">
+                        <label for="status-name" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="status-name" name="status-name" required>
+                    </div>
+                    <div class="mb-3 col-1">
+                        <label for="status-color" class="form-label">Цвет</label>
+                        <input type="color" class="form-control form-control-color" id="status-color" name="status-color" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <!--TODO Последние цвета-->
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" id="saveStatusBtn">Создать</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Book Details -->
+<div class="modal fade" id="book-details-modal" tabindex="-1" aria-labelledby="book-details-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="book-details-modal-label">Карточка книги</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <div class="book-details row">
+                    <div class="col-md-4 book-cover text-center">
+                        <img src="#" alt="Обложка книги" id="book-cover-img" class="img-fluid mb-2" hidden="hidden">
+                        <div id="book-cover-container">
+                            <label for="book-cover-upload" class="form-label">Загрузить обложку</label>
+                            <input type="file" class="form-control" id="book-cover-upload" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="col-md-8 book-info">
+                        <div class="mb-3 row">
+                            <div class="col-2">
+                                <label for="book-detail-title" class="form-label">Название</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="book-detail-title" name="book-detail-title">
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col-2">
+                                <label for="book-authors" class="form-label">Авторы</label>
+                            </div>
+                            <div class="col-10">
+                                <div class="custom-multiselect position-relative" id="book-authors">
+                                    <div class="form-control select-display" id="authorSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="selected-items">Выберите авторов</span>
+                                    </div>
+                                    <div class="dropdown-menu w-100" id="authorDropdownMenu">
+                                        <div class="px-2 mb-2">
+                                            <input type="text" class="form-control" id="authorSearchInput" placeholder="Поиск">
+                                        </div>
+                                        <div class="options-list" id="authorOptionsList"></div>
+                                    </div>
+                                    <input type="hidden" name="selectedAuthors" id="selectedAuthors">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col-2">
+                                <label for="book-shelves" class="form-label">Полка</label>
+                            </div>
+                            <div class="col-10">
+                                <div class="custom-multiselect position-relative" id="book-shelves">
+                                    <div class="form-control select-display" id="shelfSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="selected-items">Выберите полку</span>
+                                    </div>
+                                    <div class="dropdown-menu w-100" id="shelfDropdownMenu">
+                                        <div class="px-2 mb-2">
+                                            <input type="text" class="form-control" id="shelfSearchInput" placeholder="Поиск">
+                                        </div>
+                                        <div class="options-list" id="shelfOptionsList"></div>
+                                    </div>
+                                    <input type="hidden" name="selectedShelf" id="selectedShelf">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col-2">
+                                <label for="book-statuses" class="form-label">Статус</label>
+                            </div>
+                            <div class="col-10">
+                                <div class="custom-multiselect position-relative" id="book-statuses">
+                                    <div class="form-control select-display" id="statusSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="selected-items">Выберите статус...</span>
+                                    </div>
+                                    <div class="dropdown-menu w-100" id="statusDropdownMenu">
+                                        <div class="px-2 mb-2">
+                                            <input type="text" class="form-control" id="statusSearchInput" placeholder="Поиск">
+                                        </div>
+                                        <div class="options-list" id="statusOptionsList"></div>
+                                    </div>
+                                    <input type="hidden" name="selectedStatus" id="selectedStatus">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Notes Section -->
+                        <section id="notes" class="notes mt-4" aria-label="Заметки">
+                            <h3 class="h6 mb-3">Заметки</h3>
+                            <ul class="notes-list list-group mb-3" aria-live="polite">
+                                <!-- Dynamic notes will be inserted here -->
+                            </ul>
+                            <form action="">
+                                <div class="mb-3">
+                                    <textarea class="form-control" id="newNote" rows="3" placeholder="Введите текст заметки"></textarea>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary" data-action="add-note">➕ Добавить</button>
+                            </form>
+                        </section>
+                        <!-- Quotes Section -->
+                        <section id="quotes" class="quotes mt-4" aria-label="Цитаты">
+                            <h3 class="h6 mb-3">Цитаты</h3>
+                            <ul class="quotes-list list-group mb-3" aria-live="polite">
+                                <!-- Dynamic quotes will be inserted here -->
+                            </ul>
+                            <button type="button" class="btn btn-outline-primary" data-action="add-quote">➕ Добавить</button>
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" id="deleteBook">Удалить</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="saveBook">Сохранить</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Добавить запись -->
+<div class="modal fade" id="add-diary-modal" tabindex="-1" aria-labelledby="add-diary-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg add-diary-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="add-diary-modal-label">Запись в дневник</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form id="add-diary-form" class="modal-body">
+                <div class="mb-3 row">
+                    <div class="col-2">
+                        <label for="diary-date">Дата</label>
+                    </div>
+                    <div class="col-10">
+                        <input class="form-control" type="datetime-local" name="diary-date" id="diary-date">
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <div class="col-2">
+                        <label>Настроение</label>
+                    </div>
+                    <div class="col-10">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="diary-mood" id="diary-mood-1" value="1">
+                            <label class="form-check-label" for="diary-mood-1">1</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="diary-mood" id="diary-mood-2" value="2">
+                            <label class="form-check-label" for="diary-mood-2">2</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="diary-mood" id="diary-mood-3" value="3">
+                            <label class="form-check-label" for="diary-mood-3">3</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="diary-mood" id="diary-mood-4" value="4">
+                            <label class="form-check-label" for="diary-mood-4">4</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="diary-mood" id="diary-mood-5" value="5">
+                            <label class="form-check-label" for="diary-mood-5">5</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <div class="col-2">
+                        <label for="diary-book" class="form-label">Книга</label>
+                    </div>
+                    <div class="col-10">
+                        <div class="custom-multiselect position-relative" id="diary-book">
+                            <div class="form-control select-display" id="diaryBookSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="selected-items">Выберите книгу</span>
+                            </div>
+                            <div class="dropdown-menu w-100" id="diaryBookDropdownMenu">
+                                <div class="px-2 mb-2">
+                                    <input type="text" class="form-control" id="diaryBookSearchInput" placeholder="Поиск">
+                                </div>
+                                <div class="options-list" id="diaryBookOptionsList"></div>
+                            </div>
+                            <input type="hidden" name="selectedShelf" id="selectedDiaryBook">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <div class="col-2">
+                        <label for="diary-book" class="form-label">Глава</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" class="form-control" id="diaryBookChapter" placeholder="Глава 25: Важное сообщение">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <h3 class="h6 mb-3">Заметки</h3>
+                    <!-- Текстовая область для заметки -->
+                    <div class="mb-3">
+                        <textarea class="form-control" id="diaryNote" rows="3" placeholder="Введите текст заметки"></textarea>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" id="saveDiaryBtn">Создать</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Bootstrap 5 JS (with Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<!-- Custom JavaScript (to be added separately) -->
+<script src="/js/auth.js"></script>
+<script src="/js/request.js"></script>
+<script src="js/agile.js"></script>
+<script src="/js/index.js"></script>
+<script src="/js/shelves.js"></script>
+<script src="/js/book.js"></script>
+<script src="/js/createBook.js"></script>
+<script src="/js/autocomplete.js"></script>
+</body>
+</html>
