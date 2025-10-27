@@ -5,7 +5,6 @@ namespace App\Infrastructure\Services;
 use App\Application\Commands\Status\CreateStatusCommand;
 use App\Application\Dto\LoginDto;
 use App\Application\Dto\StatusDto;
-use App\Application\Dto\UpdateStatusDto;
 use App\Application\Dto\UserDto;
 use App\Domain\Entities\User;
 use App\Domain\ValueObjects\Color;
