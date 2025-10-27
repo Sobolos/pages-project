@@ -28,6 +28,8 @@ class UpdateReadingProgressCommand
     {
         $this->bookRepository->findAllWithFilter(['book_id' => $dto->bookId, 'user_id' => $userId]);
         $book = $this->bookRepository->findById($dto->bookId);
+        $epubPosition = 0;
+        $physicalPage = 0;
 
         // Если задана только физическая страница — вычисляем процент
         if ($dto->physicalPage !== null && $dto->epubPosition === null) {
@@ -45,9 +47,9 @@ class UpdateReadingProgressCommand
         $progress = new ReadingProgress(
             userId: $userId,
             bookId: $dto->bookId,
-            epubPosition: $dto->epubPosition,
+            epubPosition: $epubPosition,
             updatedAt: new \DateTimeImmutable(),
-            physicalPage: $dto->physicalPage
+            physicalPage: $physicalPage
         );
 
         $this->readingProgressRepository->save($progress);
