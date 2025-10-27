@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\Quote;
+use App\Domain\Interfaces\Repositories\QuoteRepositoryInterface;
 use App\Infrastructure\Mappers\QuoteMapper;
-use App\Infrastructure\Repositories\Interfaces\QuoteRepositoryInterface;
 
 class PdoQuoteRepository extends PdoRepository implements QuoteRepositoryInterface
 {

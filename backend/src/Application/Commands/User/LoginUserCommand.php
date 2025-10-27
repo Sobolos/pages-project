@@ -7,11 +7,11 @@ use App\Infrastructure\Services\AuthService;
 
 class LoginUserCommand
 {
-    private authService $authService;
+    private AuthService $authService;
 
     public function __construct()
     {
-        $this->authService = new authService();
+        $this->authService = new AuthService();
     }
 
     public function execute(LoginDto $userDto): array

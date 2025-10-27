@@ -3,7 +3,7 @@ namespace App\Application\Commands\Quote;
 
 use App\Application\Dto\QuoteDto;
 use App\Domain\Entities\Quote;
-use App\Infrastructure\Repositories\Interfaces\QuoteRepositoryInterface;
+use App\Domain\Interfaces\Repositories\QuoteRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoQuoteRepository;
 use App\Infrastructure\Services\Validator;
 

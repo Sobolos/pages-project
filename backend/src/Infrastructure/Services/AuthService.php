@@ -2,16 +2,18 @@
 
 namespace App\Infrastructure\Services;
 
+use App\Application\Commands\Shelf\CreateShelfCommand;
 use App\Application\Commands\Status\CreateStatusCommand;
 use App\Application\Dto\LoginDto;
+use App\Application\Dto\ShelfDto;
 use App\Application\Dto\StatusDto;
 use App\Application\Dto\UserDto;
-use App\Domain\Entities\User;
-use App\Domain\ValueObjects\Color;
-use App\Infrastructure\Repositories\Interfaces\UserRepositoryInterface;
-use App\Infrastructure\Repositories\Pdo\PdoUserRepository;
-use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
 use App\Config\jwt;
+use App\Domain\Entities\User;
+use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
+use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
+use App\Domain\ValueObjects\Color;
+use App\Infrastructure\Repositories\Pdo\PdoUserRepository;
 
 class AuthService
 {
@@ -19,12 +21,14 @@ class AuthService
     private CreateStatusCommand $createStatusCommand;
     private HistoryGeneratorServiceInterface $historyGeneratorService;
     private string $jwtSecret;
+    private CreateShelfCommand $createShelfCommand;
 
     public function __construct()
     {
         $this->userRepository = new PdoUserRepository();
         $this->createStatusCommand = new CreateStatusCommand();
         $this->historyGeneratorService = new HistoryGeneratorService();
+        $this->createShelfCommand = new CreateShelfCommand();
         $this->jwtSecret = jwt::JWT_SECRET;
     }
 
@@ -54,6 +58,15 @@ class AuthService
 
         foreach ($defaultStatuses as $statusData) {
             $this->createStatusCommand->execute($statusData);
+        }
+
+        $defaultShelves = [
+            new ShelfDto('Учебная литература', $userId),
+            new ShelfDto('Художественная литература', $userId)
+        ];
+
+        foreach ($defaultShelves as $shelfData) {
+            $this->createShelfCommand->execute($shelfData);
         }
 
         $this->historyGeneratorService->generateUserRegisteredEvent($user);

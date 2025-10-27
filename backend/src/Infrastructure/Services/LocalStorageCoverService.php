@@ -11,9 +11,14 @@ class LocalStorageCoverService implements StorageServiceInterface
 
     public function __construct()
     {
-        $this->uploadDir = __DIR__ . '/../../../public/storage/epub/';
-        $this->publicUrlPrefix = '/storage/epub/';
-        if (!is_dir($this->uploadDir)) mkdir($this->uploadDir, 0755, true);
+        $this->uploadDir = __DIR__ . '/../../../public/storage/cover/';
+        $this->publicUrlPrefix = '/storage/cover/';
+
+        if (!is_dir($this->uploadDir)) {
+            if (!mkdir($this->uploadDir, 0755, true) && !is_dir($this->uploadDir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->uploadDir));
+            }
+        }
     }
 
     public function saveFromUpload(array $file): string

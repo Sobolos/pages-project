@@ -4,9 +4,9 @@ namespace App\Application\Commands\Books;
 use App\Application\Dto\UpdateBookDto;
 use App\Domain\Entities\Book;
 use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
+use App\Domain\Interfaces\Repositories\AuthorRepositoryInterface;
+use App\Domain\Interfaces\Repositories\BookRepositoryInterface;
 use App\Domain\ValueObjects\Rating;
-use App\Infrastructure\Repositories\Interfaces\AuthorRepositoryInterface;
-use App\Infrastructure\Repositories\Interfaces\BookRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoAuthorRepository;
 use App\Infrastructure\Repositories\Pdo\PdoBookRepository;
 use App\Infrastructure\Services\HistoryGeneratorService;
@@ -31,7 +31,7 @@ class UpdateBookCommand
     {
         $data = [
             'id' => $updateBookDto->id,
-            'user_id' => $updateBookDto->userId,
+            'user_id' => $userId,
             'title' => $updateBookDto->title,
             'status_id' => $updateBookDto->statusId,
             'rating' => $updateBookDto->rating,
@@ -71,21 +71,10 @@ class UpdateBookCommand
         $oldShelf = $book->getShelfId();
         $newShelf = $updateBookDto->shelfId;
 
-        $book = new Book(
-            id: $updateBookDto->id,
-            title: $updateBookDto->title,
-            statusId: $updateBookDto->statusId,
-            rating: new Rating($updateBookDto->rating),
-            shelfId: $updateBookDto->shelfId,
-            userId: $updateBookDto->userId,
-            coverUrl: $updateBookDto->coverUrl,
-            epubUrl: $updateBookDto->epubUrl,
-            createdAt: $updateBookDto->createdAt,
-            physicalPagesCount: $updateBookDto->physicalPageCount,
-            currentPage: $updateBookDto->currentPage,
-            authorRepository: $this->authorRepository,
-            updatedAt: new \DateTimeImmutable()
-        );
+        $book
+            ->setTitle($updateBookDto->title)
+            ->setStatusId($updateBookDto->statusId)
+            ->setShelfId($updateBookDto->shelfId);
 
         $this->bookRepository->save($book, $updateBookDto->authorsIds);
 

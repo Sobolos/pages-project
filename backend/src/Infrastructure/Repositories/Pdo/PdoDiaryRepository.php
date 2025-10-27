@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\DiaryEntry;
+use App\Domain\Interfaces\Repositories\DiaryRepositoryInterface;
 use App\Infrastructure\Mappers\DiaryMapper;
-use App\Infrastructure\Repositories\Interfaces\DiaryRepositoryInterface;
 
 class PdoDiaryRepository extends PdoRepository implements DiaryRepositoryInterface
 {

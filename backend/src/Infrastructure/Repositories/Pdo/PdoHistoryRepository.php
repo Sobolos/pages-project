@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\HistoryEntry;
+use App\Domain\Interfaces\Repositories\HistoryRepositoryInterface;
 use App\Infrastructure\Mappers\HistoryMapper;
-use App\Infrastructure\Repositories\Interfaces\HistoryRepositoryInterface;
 
 class PdoHistoryRepository extends PdoRepository implements HistoryRepositoryInterface
 {

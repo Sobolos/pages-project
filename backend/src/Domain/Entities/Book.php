@@ -1,8 +1,8 @@
 <?php
 namespace App\Domain\Entities;
 
+use App\Domain\Interfaces\Repositories\AuthorRepositoryInterface;
 use App\Domain\ValueObjects\Rating;
-use App\Infrastructure\Repositories\Interfaces\AuthorRepositoryInterface;
 
 class Book
 {
@@ -96,7 +96,7 @@ class Book
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -135,9 +135,10 @@ class Book
         $this->id = $id;
     }
 
-    public function setStatusId(int $int): void
+    public function setStatusId(int $int): self
     {
         $this->statusId = $int;
+        return $this;
     }
 
     public function getPhysicalPages(): int
@@ -153,5 +154,17 @@ class Book
     public function setEpubUrl(string $epubUrl): void
     {
         $this->epubUrl = $epubUrl;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    public function setShelfId(int $shelfId): self
+    {
+        $this->shelfId = $shelfId;
+        return $this;
     }
 }

@@ -1,3 +1,4 @@
+# docker/Dockerfile
 FROM php:8.3-fpm
 
 # Установка зависимостей для PDO PostgreSQL и Composer
@@ -18,8 +19,10 @@ WORKDIR /var/www/html
 # Права на файлы (для dev)
 RUN chown -R www-data:www-data /var/www/html
 
-# Скрипт для init (Composer install если vendor отсутствует)
+# Скрипт для инициализации
 COPY docker/init.sh /usr/local/bin/init.sh
 RUN chmod +x /usr/local/bin/init.sh
 
-CMD ["/usr/local/bin/init.sh"]
+# Запускаем init.sh как entrypoint, а затем стартуем php-fpm
+ENTRYPOINT ["/usr/local/bin/init.sh"]
+CMD ["php-fpm"]

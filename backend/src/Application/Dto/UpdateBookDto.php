@@ -9,13 +9,12 @@ readonly class UpdateBookDto
     public float $rating;
     public int $shelfId;
     public int $statusId;
-    public int $userId;
     public string $coverUrl;
     public string $epubUrl;
     public array $authorsIds;
     public int $physicalPageCount;
     public int $currentPage;
-    public ?\DateTimeImmutable $createdAt;
+    public ?\DateTimeImmutable $updatedAt;
 
     /**
      * @param int $id
@@ -23,13 +22,12 @@ readonly class UpdateBookDto
      * @param float $rating
      * @param int $shelfId
      * @param int $statusId
-     * @param int $userId
      * @param string $coverUrl
      * @param string $epubUrl
      * @param array $authorsIds
      * @param int $physicalPageCount
      * @param int $currentPage
-     * @param \DateTimeImmutable|null $createdAt
+     * @param \DateTimeImmutable|null $updatedAt
      */
     public function __construct(
         int $id,
@@ -37,25 +35,23 @@ readonly class UpdateBookDto
         float $rating,
         int $shelfId,
         int $statusId,
-        int $userId,
         string $coverUrl,
         string $epubUrl,
         array $authorsIds,
         int $physicalPageCount,
         int $currentPage,
-        ?\DateTimeImmutable $createdAt,
+        ?\DateTimeImmutable $updatedAt,
     ) {
         $this->id = $id;
         $this->title = $title;
         $this->rating = $rating;
         $this->shelfId = $shelfId;
         $this->statusId = $statusId;
-        $this->userId = $userId;
         $this->coverUrl = $coverUrl;
         $this->epubUrl = $epubUrl;
         $this->authorsIds = $authorsIds;
         $this->physicalPageCount = $physicalPageCount;
         $this->currentPage = $currentPage;
-        $this->createdAt = $createdAt;
+        $this->updatedAt = $updatedAt;
     }
 }

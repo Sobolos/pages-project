@@ -4,7 +4,7 @@ namespace App\Application\Commands\Author;
 
 use App\Application\Dto\AuthorDto;
 use App\Domain\Entities\Author;
-use App\Infrastructure\Repositories\Interfaces\AuthorRepositoryInterface;
+use App\Domain\Interfaces\Repositories\AuthorRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoAuthorRepository;
 use App\Infrastructure\Services\Validator;
 

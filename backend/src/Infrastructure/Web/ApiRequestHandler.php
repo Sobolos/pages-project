@@ -13,6 +13,7 @@ use App\Application\Commands\Books\UpdateBookCommand;
 use App\Application\Commands\Books\DeleteBookCommand;
 use App\Application\Commands\Books\UpdateBookStatusCommand;
 use App\Application\Commands\Books\UploadBookCoverCommand;
+use App\Application\Commands\Books\UploadCoverOnCreateCommand;
 use App\Application\Commands\Books\UploadBookEpubCommand;
 use App\Application\Commands\Note\CreateNoteCommand;
 use App\Application\Commands\Note\DeleteNoteCommand;
@@ -85,6 +86,7 @@ class ApiRequestHandler
     private BatchCreateAuthorCommand $batchCreateAuthorCommand;
     private UpdateReadingProgressCommand $updateReadingProgressCommand;
     private UploadBookCoverCommand $uploadBookCoverCommand;
+    private UploadCoverOnCreateCommand $uploadCoverOnCreateCommand;
     private UploadBookEpubCommand  $uploadBookEpubCommand;
     private RemoveBookCoverCommand $removeBookCoverCommand;
     private RemoveBookEpubCommand $removeBookEpubCommand;
@@ -131,6 +133,7 @@ class ApiRequestHandler
         $this->updateBookCommand = new UpdateBookCommand();
         $this->booksQuery = new GetBooksQuery();
         $this->uploadBookCoverCommand = new UploadBookCoverCommand();
+        $this->uploadCoverOnCreateCommand = new UploadCoverOnCreateCommand();
         $this->uploadBookEpubCommand = new UploadBookEpubCommand();
         $this->removeBookCoverCommand = new RemoveBookCoverCommand();
         $this->removeBookEpubCommand = new RemoveBookEpubCommand();
@@ -201,7 +204,7 @@ class ApiRequestHandler
 
             ###>>> Authors
             if (preg_match('#^/api/authors#', $uri) && $method === 'GET') {
-                $filters = array_merge($_GET, ['user_id' => $userId]);
+                $filters = array_merge($_GET, ['userId' => $userId]);
                 $authors = $this->authorsQuery->execute($filters);
                 return [
                     'status' => 'success',
@@ -572,6 +575,37 @@ class ApiRequestHandler
                 ];
             }
 
+            if (preg_match('#^/api/book/(\d+)#', $uri, $matches) && $method === 'GET') {
+                $filters = ['user_id' => $userId, 'id' => $matches[1]];
+                $books = $this->booksQuery->execute($filters);
+                return [
+                    'status' => 'success',
+                    'data' => array_map(
+                        fn($book) => [
+                            'id' => $book->getId(),
+                            'title' => $book->getTitle(),
+                            'rating' => $book->getRating()->getValue(),
+                            'status_id' => $book->getStatusId(),
+                            'shelf_id' => $book->getShelfId(),
+                            'user_id' => $book->getUserId(),
+                            'authors' => array_map(
+                                fn($author) => ['id' => $author->getId(), 'name' => $author->getName()],
+                                $book->getAuthors()
+                            ),
+                            'current_page' => $book->getCurrentPage(),
+                            'physical_pages' => $book->getPhysicalPages(),
+                            'epub_url' => $book->getEpubUrl(),
+                            'cover_url' => $book->getCoverUrl(),
+                        ],
+                        $books
+                    ),
+                    'pagination' => [
+                        'page' => (int)($_GET['page'] ?? 1),
+                        'per_page' => (int)($_GET['per_page'] ?? 10),
+                    ]
+                ];
+            }
+
             if (preg_match('#^/api/cover-book/(\d+)#', $uri) && $method === 'POST') {
                 $bookId = (int)$matches[1];
 
@@ -613,11 +647,16 @@ class ApiRequestHandler
                     statusId: $data['status_id'],
                     userId: $userId,
                     authorsIds: $data['selected_authors'],
-                    physicalPageCount: $data['physical_page_count'],
+                    physicalPageCount: 0,
                 );
 
                 $book = $this->createBookCommand->execute($userId, $createBookDto);
 
+                // Обработка загрузки обложки при создании книги
+                if (isset($_FILES['cover'])) {
+                    $this->uploadCoverOnCreateCommand->execute($book->getId(), $userId, $_FILES['cover']);
+                }
+
                 return [
                     'status' => 'success',
                     'data' => [
@@ -627,23 +666,28 @@ class ApiRequestHandler
                 ];
             }
 
-            if (preg_match('#^/api/books/(\d+)#', $uri, $matches) && $method === 'PUT') {
+            if (preg_match('#^/api/book/(\d+)#', $uri, $matches) && $method === 'POST') {
                 $updateBookDto = new UpdateBookDto(
                     id: (int)$matches[1],
                     title: $data['title'],
-                    rating: $data['rating'],
+                    rating: 0,
                     shelfId: $data['shelf_id'],
                     statusId: $data['status_id'],
-                    userId: $data['user_id'],
-                    coverUrl: $data['cover_url'],
-                    epubUrl: $data['epub_url'],
+                    coverUrl: '',
+                    epubUrl: '',
                     authorsIds: $data['selected_authors'],
-                    physicalPageCount: $data['physical_page_count'],
-                    currentPage: $data['current_page'],
-                    createdAt: new \DateTimeImmutable($data['created_at']),
+                    physicalPageCount: 0,
+                    currentPage: 0,
+                    updatedAt: new \DateTimeImmutable('now'),
                 );
 
                 $book = $this->updateBookCommand->execute($updateBookDto, $userId);
+
+                // Обработка загрузки обложки при создании книги
+                if (isset($_FILES['cover'])) {
+                    $this->uploadBookCoverCommand->execute($book->getId(), $userId, $_FILES['cover']);
+                }
+
                 return [
                     'status' => 'success',
                     'data' => [
@@ -653,15 +697,15 @@ class ApiRequestHandler
                 ];
             }
 
-            if (preg_match('#^/api/books/(\d+)#', $uri, $matches) && $method === 'DELETE') {
+            if (preg_match('#^/api/book/(\d+)#', $uri, $matches) && $method === 'DELETE') {
                 $this->deleteBookCommand->execute((int)$matches[1], $userId);
                 return ['status' => 'success', 'data' => []];
             }
 
-            if (preg_match('#^/api/book-status/(\d+)#', $uri, $matches) && $method === 'POST') {
+            if (preg_match('#^/api/book-status/(\d+)#', $uri, $matches) && $method === 'PATCH') {
                 $updateStatusDto = new UpdateBookStatusDto(
                     bookId: $matches[1],
-                    status: $data['status'],
+                    status: $data['status_id'],
                 );
 
                 $this->updateBookStatusCommand->execute($updateStatusDto, $userId);

@@ -1,12 +1,13 @@
 #!/bin/bash
+set -e
 
-# Проверяем, есть ли vendor/ в backend
-if [ ! -d "/var/www/html/backend/vendor" ]; then
-    echo "Installing Composer dependencies..."
-    cd /var/www/html/backend && composer install --no-dev --optimize-autoloader
-else
-    echo "Composer dependencies already installed."
+# Перейти в рабочую директорию
+cd /var/www/html/backend
+
+# Если нет vendor — установить зависимости
+if [ ! -d "vendor" ]; then
+    composer install --no-progress --no-interaction
 fi
 
-# Запускаем php-fpm
-exec php-fpm
+# Запустить переданную команду (например, php-fpm)
+exec "$@"

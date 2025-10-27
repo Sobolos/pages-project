@@ -1,7 +1,7 @@
 <?php
 namespace App\Application\Commands\Note;
 
-use App\Infrastructure\Repositories\Interfaces\NoteRepositoryInterface;
+use App\Domain\Interfaces\Repositories\NoteRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoNoteRepository;
 
 class DeleteNoteCommand

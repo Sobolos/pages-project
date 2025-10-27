@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\Book;
+use App\Domain\Interfaces\Repositories\BookRepositoryInterface;
 use App\Infrastructure\Mappers\BookMapper;
-use App\Infrastructure\Repositories\Interfaces\BookRepositoryInterface;
 
 class PdoBookRepository extends PdoRepository implements BookRepositoryInterface
 {
@@ -44,6 +44,11 @@ class PdoBookRepository extends PdoRepository implements BookRepositoryInterface
     {
         $query = 'SELECT b.* FROM books b WHERE 1=1';
         $params = [];
+
+        if (isset($filters['id'])) {
+            $query .= ' AND b.id = :id';
+            $params['id'] = $filters['id'];
+        }
 
         if (isset($filters['user_id'])) {
             $query .= ' AND b.user_id = :user_id';

@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\User;
+use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
 use App\Infrastructure\Mappers\UserMapper;
-use App\Infrastructure\Repositories\Interfaces\UserRepositoryInterface;
 
 class PdoUserRepository extends PdoRepository implements UserRepositoryInterface
 {

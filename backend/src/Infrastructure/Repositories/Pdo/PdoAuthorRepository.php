@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\Author;
+use App\Domain\Interfaces\Repositories\AuthorRepositoryInterface;
 use App\Infrastructure\Mappers\AuthorMapper;
-use App\Infrastructure\Repositories\Interfaces\AuthorRepositoryInterface;
 
 class PdoAuthorRepository extends PdoRepository implements AuthorRepositoryInterface
 {
@@ -45,9 +45,9 @@ class PdoAuthorRepository extends PdoRepository implements AuthorRepositoryInter
         $query = 'SELECT * FROM authors WHERE 1=1';
         $params = [];
 
-        if (isset($filters['user_id'])) {
-            $query .= ' AND user_id = :user_id';
-            $params['user_id'] = $filters['user_id'];
+        if (isset($filters['userId'])) {
+            $query .= ' AND user_id = :userId';
+            $params['userId'] = $filters['userId'];
         }
 
         if (isset($filters['name'])) {

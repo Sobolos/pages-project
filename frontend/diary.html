@@ -147,6 +147,14 @@
                             <span class="selected-items">Выберите авторов...</span>
                         </div>
                         <div class="dropdown-menu w-100" id="authorDropdownMenuAdd">
+                            <div class="d-flex justify-content-end mb-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm me-1" id="editAuthorBtnAdd" style="display: none;" onclick="editAuthor(true)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm" id="deleteAuthorBtnAdd" style="display: none;" onclick="deleteAuthor(true)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
                             <div class="px-2 mb-2">
                                 <input type="text" class="form-control" id="authorSearchInputAdd" placeholder="Поиск...">
                             </div>
@@ -268,6 +276,14 @@
                                         <span class="selected-items">Выберите авторов</span>
                                     </div>
                                     <div class="dropdown-menu w-100" id="authorDropdownMenu">
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm me-1" id="editAuthorBtn" style="display: none;" onclick="editAuthor()">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" id="deleteAuthorBtn" style="display: none;" onclick="deleteAuthor()">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
                                         <div class="px-2 mb-2">
                                             <input type="text" class="form-control" id="authorSearchInput" placeholder="Поиск...">
                                         </div>

@@ -3,8 +3,8 @@ namespace App\Application\Commands\Note;
 
 use App\Application\Dto\NoteDto;
 use App\Domain\Entities\Note;
+use App\Domain\Interfaces\Repositories\NoteRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoNoteRepository;
-use App\Infrastructure\Repositories\Interfaces\NoteRepositoryInterface;
 use App\Infrastructure\Services\Validator;
 
 class UpdateNoteCommand

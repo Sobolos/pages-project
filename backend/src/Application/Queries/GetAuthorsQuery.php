@@ -1,7 +1,7 @@
 <?php
 namespace App\Application\Queries;
 
-use App\Infrastructure\Repositories\Interfaces\AuthorRepositoryInterface;
+use App\Domain\Interfaces\Repositories\AuthorRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoAuthorRepository;
 
 class GetAuthorsQuery

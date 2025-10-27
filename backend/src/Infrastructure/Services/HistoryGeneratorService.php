@@ -7,9 +7,9 @@ use App\Domain\Entities\HistoryEntry;
 use App\Domain\Entities\Note;
 use App\Domain\Entities\Quote;
 use App\Domain\Entities\User;
-use App\Infrastructure\Repositories\Interfaces\HistoryRepositoryInterface;
-use App\Infrastructure\Repositories\Pdo\PdoHistoryRepository;
 use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
+use App\Domain\Interfaces\Repositories\HistoryRepositoryInterface;
+use App\Infrastructure\Repositories\Pdo\PdoHistoryRepository;
 
 class HistoryGeneratorService implements HistoryGeneratorServiceInterface
 {

@@ -23,10 +23,10 @@ class BookMapper extends BaseMapper
             coverUrl: $row['cover_url'] ?? null,
             epubUrl: $row['epub_url'] ?? null,
             createdAt: new \DateTimeImmutable($row['created_at']),
-            updatedAt: new \DateTimeImmutable($row['updated_at']),
             physicalPagesCount: (int)$row['physical_pages'],
             currentPage: (int)$row['current_page'],
-            authorRepository: new PdoAuthorRepository()
+            authorRepository: new PdoAuthorRepository(),
+            updatedAt: new \DateTimeImmutable($row['updated_at'] ?? '')
         );
         $this->addToMap($entity, $entity->getId());
         return $entity;
@@ -44,7 +44,7 @@ class BookMapper extends BaseMapper
             'cover_url' => $book->getCoverUrl(),
             'epub_url' => $book->getEpubUrl(),
             'created_at' => $book->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $book->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'updated_at' => $book->getUpdatedAt()?->format('Y-m-d H:i:s'),
             'physical_pages' => $book->getPhysicalPages(),
             'current_page' => $book->getCurrentPage(),
         ];

@@ -3,11 +3,11 @@ namespace App\Application\Commands\Note;
 
 use App\Application\Dto\NoteDto;
 use App\Domain\Entities\Note;
-use App\Infrastructure\Repositories\Interfaces\NoteRepositoryInterface;
+use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
+use App\Domain\Interfaces\Repositories\NoteRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoNoteRepository;
 use App\Infrastructure\Services\HistoryGeneratorService;
 use App\Infrastructure\Services\Validator;
-use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
 
 class CreateNoteCommand
 {

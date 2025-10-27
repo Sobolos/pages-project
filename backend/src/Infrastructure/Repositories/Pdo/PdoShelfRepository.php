@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\Shelf;
+use App\Domain\Interfaces\Repositories\ShelfRepositoryInterface;
 use App\Infrastructure\Mappers\ShelfMapper;
-use App\Infrastructure\Repositories\Interfaces\ShelfRepositoryInterface;
 
 class PdoShelfRepository extends PdoRepository implements ShelfRepositoryInterface
 {

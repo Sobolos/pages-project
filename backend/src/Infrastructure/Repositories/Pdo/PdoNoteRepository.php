@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Repositories\Pdo;
 
 use App\Domain\Entities\Note;
+use App\Domain\Interfaces\Repositories\NoteRepositoryInterface;
 use App\Infrastructure\Mappers\NoteMapper;
-use App\Infrastructure\Repositories\Interfaces\NoteRepositoryInterface;
 
 class PdoNoteRepository extends PdoRepository implements NoteRepositoryInterface
 {

@@ -2,7 +2,7 @@
 
 namespace App\Application\Commands\Shelf;
 
-use App\Infrastructure\Repositories\Interfaces\ShelfRepositoryInterface;
+use App\Domain\Interfaces\Repositories\ShelfRepositoryInterface;
 use App\Infrastructure\Repositories\Pdo\PdoShelfRepository;
 
 class DeleteShelfCommand
