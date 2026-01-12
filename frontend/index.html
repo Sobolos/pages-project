@@ -18,13 +18,13 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="/" aria-current="page">Странички</a>
                 </li>
-                <li class="nav-item">
+                <!--<li class="nav-item">
                     <a class="nav-link active" href="/diary.html" aria-current="page">Дневник</a>
-                </li>
+                </li>-->
             </ul>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link nav-link--logout" href="#">Выйти</a>
+                    <a class="nav-link nav-link--logout" href="#" onclick="logout()">Выйти</a>
                 </li>
             </ul>
         </div>
@@ -41,8 +41,9 @@
             <div class="d-flex justify-content-end my-4">
                 <!-- Quick Actions -->
                 <section class="quick-actions mb-4" aria-label="Быстрые действия">
-                    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-action="add-diary" data-bs-target="#add-diary-modal">Запись в дневник</button>
+                    <!--<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-action="add-diary" data-bs-target="#add-diary-modal">Запись в дневник</button>-->
                     <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-action="add-book" data-bs-target="#add-book-modal">Добавить книгу</button>
+                    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-action="manage-authors" data-bs-target="#authorsModal">Управление авторами</button>
                     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-action="add-status" data-bs-target="#add-status-modal">Добавить статус</button>
                 </section>
             </div>
@@ -229,6 +230,36 @@
     </div>
 </div>
 
+<!-- Modal: Authors Management -->
+<div class="modal fade" id="authorsModal" tabindex="-1" aria-labelledby="authorsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="authorsModalLabel">Управление авторами</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Автор</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="authorsList">
+                            <!-- Authors will be inserted here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal: Book Details -->
 <div class="modal fade" id="book-details-modal" tabindex="-1" aria-labelledby="book-details-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -265,6 +296,14 @@
                                         <span class="selected-items">Выберите авторов</span>
                                     </div>
                                     <div class="dropdown-menu w-100" id="authorDropdownMenu">
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm me-1" id="editAuthorBtn" style="display: none;" onclick="editAuthor()">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" id="deleteAuthorBtn" style="display: none;" onclick="deleteAuthor()">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
                                         <div class="px-2 mb-2">
                                             <input type="text" class="form-control" id="authorSearchInput" placeholder="Поиск">
                                         </div>
@@ -444,5 +483,6 @@
 <script src="/js/book.js"></script>
 <script src="/js/createBook.js"></script>
 <script src="/js/autocomplete.js"></script>
+<script src="/js/authors.js"></script>
 </body>
 </html>

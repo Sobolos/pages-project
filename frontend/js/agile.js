@@ -116,7 +116,7 @@ async function handleDrop(e) {
     const newStatusId = target.dataset.statusId;
 
     try {
-        await fetchWithAuth(`${API_BASE}/book/${bookId}/status`, {
+        await fetchWithAuth(`${API_BASE}/book-status/${bookId}`, {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({status_id: newStatusId})

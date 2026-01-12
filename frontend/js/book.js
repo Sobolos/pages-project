@@ -27,18 +27,85 @@ async function openBookModal(id) {
 
     function setBookCover(coverUrl) {
         if (coverUrl === null) {
+            console.log('coverUrl is null');
             cover.setAttribute('hidden', 'hidden')
         }
 
         if (coverUrl !== null) {
+            console.log('coverUrl is not null');
+            console.log(`${BACKEND_BASE}` + coverUrl);
             cover.removeAttribute('hidden');
-            cover.setAttribute('src', `${BACKEND_BASE}` + coverUrl)
+            cover.setAttribute('src', coverUrl)
+        }
+    }
+
+    async function editAuthor() {
+        const authorId = selectedAuthors[0];
+        const author = authorOptionsData.find(a => a.id === authorId);
+        
+        if (!author) return;
+        
+        const newName = prompt('Введите новое имя автора:', author.name);
+        if (!newName || newName.trim() === '') return;
+        
+        try {
+            const response = await fetchWithAuth(`${API_BASE}/authors/${authorId}`, {
+                method: 'PUT',
+                body: JSON.stringify({ name: newName })
+            });
+            
+            // Обновляем данные в списке и интерфейсе
+            author.name = newName;
+            authorOptionsData = authorOptionsData.map(a => a.id === authorId ? author : a);
+            updateAuthorDisplay();
+            renderOptions(authorOptionsList, authorOptionsData, selectedAuthors, true);
+            
+            // Обновляем глобальный массив authors
+            const globalAuthorIndex = authors.findIndex(a => a.id === authorId);
+            if (globalAuthorIndex !== -1) {
+                authors[globalAuthorIndex].name = newName;
+            }
+            
+            showEditDeleteButtons();
+        } catch (error) {
+            console.error('Ошибка при редактировании автора', error);
+            alert('Не удалось отредактировать автора');
+        }
+    }
+
+    async function deleteAuthor() {
+        if (!confirm('Вы уверены, что хотите удалить этого автора?')) return;
+        
+        const authorId = selectedAuthors[0];
+        const author = authorOptionsData.find(a => a.id === authorId);
+        
+        try {
+            await fetchWithAuth(`${API_BASE}/authors/${authorId}`, {
+                method: 'DELETE'
+            });
+            
+            // Удаляем автора из списков
+            authorOptionsData = authorOptionsData.filter(a => a.id !== authorId);
+            selectedAuthors = selectedAuthors.filter(id => id !== authorId);
+            
+            // Обновляем интерфейс
+            selectedAuthorsInput.value = JSON.stringify(selectedAuthors);
+            updateAuthorDisplay();
+            renderOptions(authorOptionsList, authorOptionsData, selectedAuthors, true);
+            
+            // Удаляем из глобального массива authors
+            authors = authors.filter(a => a.id !== authorId);
+            
+            showEditDeleteButtons();
+        } catch (error) {
+            console.error('Ошибка при удалении автора', error);
+            alert('Не удалось удалить автора');
         }
     }
 
     try {
         // Загрузка данных книги
-        let book = await fetchWithAuth(`${API_BASE}/books/${id}`, {
+        let book = await fetchWithAuth(`${API_BASE}/book/${id}`, {
             method: 'GET'
         });
 
@@ -55,15 +122,16 @@ async function openBookModal(id) {
         selectedAuthorsInput.value = JSON.stringify(selectedAuthors);
 
         // Установка выбранной полки (если есть)
-        selectedShelf = book.shelf ? book.shelf.id : null;
+        selectedShelf = book.shelf_id ?? null;
         selectedShelfInput.value = selectedShelf || '';
 
         // Установка выбранного статуса (если есть)
-        selectedStatus = book.status ? book.status.id : null;
+        selectedStatus = book.status_id ?? null;
         selectedStatusInput.value = selectedStatus || '';
 
-        console.log(book.coverUrl)
-        setBookCover(book.coverUrl);
+        if (book.cover_url !== null) {
+            setBookCover(book.cover_url);
+        }
 
         // Универсальная функция рендеринга опций
         function renderOptions(container, options, selectedItems, isMultiple, query = '') {
@@ -130,6 +198,7 @@ async function openBookModal(id) {
             selectedAuthors = Array.from(authorOptionsList.querySelectorAll('input:checked')).map(input => parseInt(input.value));
             selectedAuthorsInput.value = JSON.stringify(selectedAuthors);
             updateAuthorDisplay();
+            showEditDeleteButtons();
         }
 
         // Обновление отображаемого текста для авторов
@@ -229,7 +298,7 @@ async function openBookModal(id) {
                 // Если есть новые авторы, создаем их на backend
                 if (newAuthors.length > 0) {
                     const newAuthorNames = newAuthors.map(author => author.name);
-                    const createResponse = await fetchWithAuth(`${API_BASE}/authors/batch-create`, {
+                    const createResponse = await fetchWithAuth(`${API_BASE}/batch-authors`, {
                         method: 'POST',
                         body: JSON.stringify({ names: newAuthorNames })
                     });
@@ -254,16 +323,16 @@ async function openBookModal(id) {
                 const data = JSON.stringify(
                     {
                         title: bookTitle.value,
-                        selectedAuthors: finalSelectedAuthors,
-                        selectedShelf: selectedShelf,
-                        selectedStatus: selectedStatus
+                        selected_authors: finalSelectedAuthors,
+                        shelf_id: selectedShelf,
+                        status_id: selectedStatus
                     }
                 );
 
                 formData.append('data', data);
                 const fileInput = document.getElementById('book-cover-upload');
                 if (fileInput && fileInput.files.length > 0) {
-                    formData.append('file', fileInput.files[0]);
+                    formData.append('cover', fileInput.files[0]);
                 }
 
                 // Сохраняем книгу
@@ -296,3 +365,4 @@ async function openBookModal(id) {
         alert('Не удалось загрузить данные книги');
     }
 }
+

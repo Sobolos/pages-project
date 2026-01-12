@@ -1,5 +1,6 @@
 let newAuthors = []; // Новые авторы {tempId: -N, name: 'Имя'}
 
+// Обработка события открытия модального окна добавления книги
 document.getElementById('add-book-modal').addEventListener('show.bs.modal', () => {
     const authorSelectDisplay = document.getElementById('authorSelectDisplayAdd');
     const authorSearchInput = document.getElementById('authorSearchInputAdd');
@@ -85,16 +86,18 @@ document.getElementById('add-book-modal').addEventListener('show.bs.modal', () =
     function handleAuthorSelectionChange() {
         selectedAuthors = Array.from(authorOptionsList.querySelectorAll('input:checked')).map(input => parseInt(input.value));
         selectedAuthorsInput.value = JSON.stringify(selectedAuthors);
-        updateAuthorDisplay();
+        updateAuthorDisplay(true);
+        showEditDeleteButtons(true);
     }
 
     // Обновление отображаемого текста для авторов
-    function updateAuthorDisplay() {
+    function updateAuthorDisplay(addMode = false) {
         const selectedNames = selectedAuthors
             .map(id => authorOptionsData.find(opt => opt.id === id)?.name)
             .filter(name => name)
             .join(', ');
-        authorSelectDisplay.querySelector('.selected-items').textContent = selectedNames || 'Выберите авторов';
+        const display = addMode ? authorSelectDisplay : document.getElementById('authorSelectDisplay');
+        display.querySelector('.selected-items').textContent = selectedNames || 'Выберите авторов...';
     }
 
     // Обработка изменения выбора полок (single)
@@ -110,7 +113,7 @@ document.getElementById('add-book-modal').addEventListener('show.bs.modal', () =
         const selectedName = selectedShelf
             ? shelfOptionsData.find(opt => opt.id === selectedShelf)?.name || ''
             : '';
-        shelfSelectDisplay.querySelector('.selected-items').textContent = selectedName || 'Выберите полку';
+        shelfSelectDisplay.querySelector('.selected-items').textContent = selectedName || 'Выберите полку...';
     }
 
     // Обработка изменения выбора статусов (single)
@@ -126,7 +129,7 @@ document.getElementById('add-book-modal').addEventListener('show.bs.modal', () =
         const selectedName = selectedStatus
             ? statusOptionsData.find(opt => opt.id === selectedStatus)?.name || ''
             : '';
-        statusSelectDisplay.querySelector('.selected-items').textContent = selectedName || 'Выберите статус';
+        statusSelectDisplay.querySelector('.selected-items').textContent = selectedName || 'Выберите статус...';
     }
 
     // Поиск по авторам
@@ -171,13 +174,15 @@ document.getElementById('add-book-modal').addEventListener('show.bs.modal', () =
 
     // Первичный рендеринг
     renderOptions(authorOptionsList, authorOptionsData, selectedAuthors, true);
-    updateAuthorDisplay();
+    updateAuthorDisplay(true);
+    showEditDeleteButtons(true);
     renderOptions(shelfOptionsList, shelfOptionsData, selectedShelf, false);
     updateShelfDisplay();
     renderOptions(statusOptionsList, statusOptionsData, selectedStatus, false);
     updateStatusDisplay();
 });
 
+// Обработчик сохранения книги
 document.getElementById('saveBookBtn').addEventListener('click', async () => {
     const title = document.getElementById('book-title').value;
     const selectedAuthorsInput = document.getElementById('selectedAuthorsAdd');
@@ -208,7 +213,7 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
 
             // Заменяем tempId на реальные ID
             newAuthors.forEach((newAuthor, index) => {
-                const realId = createResponse[index].id;
+                const realId = createResponse['data'][index].id;
                 const tempIdIndex = finalSelectedAuthors.indexOf(newAuthor.id);
                 if (tempIdIndex !== -1) {
                     finalSelectedAuthors[tempIdIndex] = realId;
@@ -221,7 +226,7 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
         }
 
         //нужно чтобы сначала грузилась книга а потом к ней обложка и епаб
-        //const formData = new FormData();
+        const formData = new FormData();
         const data = JSON.stringify({
             title: title,
             shelf_id: selectedShelf,
@@ -230,12 +235,12 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
             author_names: [], // Для совместимости
             physical_page_count: 0
         });
-        //formData.append('data', data);
+        formData.append('data', data);
 
-        // const fileInput = document.getElementById('book-cover');
-        // if (fileInput && fileInput.files.length > 0) {
-        //     formData.append('file', fileInput.files[0]);
-        // }
+        const fileInput = document.getElementById('book-cover');
+        if (fileInput && fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+        }
 
         await fetchWithAuth(`${API_BASE}/books`, {
             method: 'POST',
@@ -244,8 +249,10 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
         });
         bootstrap.Modal.getInstance(document.getElementById('add-book-modal')).hide();
         init(); // Перезагружаем данные
+        newAuthors = []; // Сбрасываем массив новых авторов
     } catch (error) {
         console.error('Ошибка создания книги', error);
         alert('Ошибка создания книги');
     }
 });
+
