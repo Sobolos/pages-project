@@ -7,6 +7,7 @@ class ProtectedRoutes
     public const ROUTES = [
         '#^/api/books(/.*)?$#',
         '#^/api/book(/.*)?$#',
+        '#^/api/book-update$#',
         '#^/api/statuses(/.*)?$#',
         '#^/api/shelves(/.*)?$#',
         '#^/api/authors(/.*)?$#',

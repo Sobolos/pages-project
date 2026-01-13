@@ -678,9 +678,9 @@ class ApiRequestHandler
                 ];
             }
 
-            if (preg_match('#^/api/book/(\d+)#', $uri, $matches) && $method === 'POST') {
+            if (preg_match('#^/api/book-update#', $uri, $matches) && $method === 'POST') {
                 $updateBookDto = new UpdateBookDto(
-                    id: (int)$matches[1],
+                    id: $data['id'],
                     title: $data['title'],
                     rating: 0,
                     shelfId: $data['shelf_id'],

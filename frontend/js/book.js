@@ -586,9 +586,12 @@ async function openBookModal(id) {
         loadNotes(); // Загружаем заметки при открытии модального окна
         loadQuotes(); // Загружаем цитаты при открытии модального окна
 
-        // Обработчик кнопки сохранения книги
+        // Удаление предыдущего обработчика, если он существует
         const saveBookButton = document.getElementById('saveBook');
-        saveBookButton.addEventListener('click', async () => {
+        const newSaveBookButton = saveBookButton.cloneNode(true);
+        saveBookButton.parentNode.replaceChild(newSaveBookButton, saveBookButton);
+        
+        newSaveBookButton.addEventListener('click', async () => {
             const bookTitle = document.getElementById('book-detail-title').value;
             const selectedShelf = selectedShelfInput.value ? parseInt(selectedShelfInput.value) : null;
             const selectedStatus = selectedStatusInput.value ? parseInt(selectedStatusInput.value) : null;
@@ -626,6 +629,7 @@ async function openBookModal(id) {
                 const formData = new FormData();
                 const data = JSON.stringify(
                     {
+                        id: id,
                         title: bookTitle,
                         selected_authors: finalSelectedAuthors,
                         shelf_id: selectedShelf,
@@ -640,12 +644,14 @@ async function openBookModal(id) {
                 }
 
                 // Сохраняем книгу
-                await fetchWithAuth(`${API_BASE}/book/${id}`, {
+                await fetchWithAuth(`${API_BASE}/book-update`, {
                     method: 'POST',
                     body: formData
                 });
 
                 // Re-render the board
+                selectedAuthors = [];
+                finalSelectedAuthors = [];
                 init();
             } catch (e) {
                 console.error('Ошибка при сохранении книги', e);
@@ -653,9 +659,12 @@ async function openBookModal(id) {
             }
         });
 
-        // Обработчик кнопки удаления книги
+        // Удаление предыдущего обработчика удаления, если он существует
         const deleteBookButton = document.getElementById('deleteBook');
-        deleteBookButton.addEventListener('click', async () => {
+        const newDeleteBookButton = deleteBookButton.cloneNode(true);
+        deleteBookButton.parentNode.replaceChild(newDeleteBookButton, deleteBookButton);
+        
+        newDeleteBookButton.addEventListener('click', async () => {
             if (!confirm('Вы уверены, что хотите удалить эту книгу?')) return;
 
             try {
