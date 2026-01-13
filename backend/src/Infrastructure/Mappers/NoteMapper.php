@@ -16,9 +16,13 @@ class NoteMapper extends BaseMapper
             bookId: (int)$row['book_id'],
             userId: (int)$row['user_id'],
             content: $row['content'],
-            createdAt: new \DateTimeImmutable($row['created_at']),
-            updatedAt: new \DateTimeImmutable($row['updated_at'])
+            createdAt: new \DateTimeImmutable($row['created_at']) ?? new \DateTimeImmutable('now'),
         );
+
+        if ($row['updated_at']) {
+            $entity->setUpdatedAt(new \DateTimeImmutable($row['updated_at']));
+        }
+
         $this->addToMap($entity, $entity->getId());
         return $entity;
     }
@@ -31,7 +35,7 @@ class NoteMapper extends BaseMapper
             'user_id' => $note->getUserId(),
             'content' => $note->getContent(),
             'created_at' => $note->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $note->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'updated_at' => $note->getUpdatedAt()?->format('Y-m-d H:i:s') ?? null,
         ];
     }
 }

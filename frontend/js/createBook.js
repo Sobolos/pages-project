@@ -87,7 +87,6 @@ document.getElementById('add-book-modal').addEventListener('show.bs.modal', () =
         selectedAuthors = Array.from(authorOptionsList.querySelectorAll('input:checked')).map(input => parseInt(input.value));
         selectedAuthorsInput.value = JSON.stringify(selectedAuthors);
         updateAuthorDisplay(true);
-        showEditDeleteButtons(true);
     }
 
     // Обновление отображаемого текста для авторов
@@ -175,7 +174,6 @@ document.getElementById('add-book-modal').addEventListener('show.bs.modal', () =
     // Первичный рендеринг
     renderOptions(authorOptionsList, authorOptionsData, selectedAuthors, true);
     updateAuthorDisplay(true);
-    showEditDeleteButtons(true);
     renderOptions(shelfOptionsList, shelfOptionsData, selectedShelf, false);
     updateShelfDisplay();
     renderOptions(statusOptionsList, statusOptionsData, selectedStatus, false);
@@ -239,7 +237,7 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
 
         const fileInput = document.getElementById('book-cover');
         if (fileInput && fileInput.files.length > 0) {
-            formData.append('file', fileInput.files[0]);
+            formData.append('cover', fileInput.files[0]);
         }
 
         await fetchWithAuth(`${API_BASE}/books`, {

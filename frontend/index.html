@@ -66,8 +66,11 @@
             </h1>
 
             <div class="col-6 d-flex justify-content-end ">
-                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#add-shelf-modal">Добавить полку</button>
+                <div>
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#add-shelf-modal">Добавить полку</button>
+                </div>
             </div>
+
         </div>
 
         <div>
@@ -370,7 +373,18 @@
                             <ul class="quotes-list list-group mb-3" aria-live="polite">
                                 <!-- Dynamic quotes will be inserted here -->
                             </ul>
-                            <button type="button" class="btn btn-outline-primary" data-action="add-quote">➕ Добавить</button>
+                            <form action="">
+                                <div class="mb-3">
+                                    <textarea class="form-control" id="newQuote" rows="2" placeholder="Введите цитату"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="quoteAuthor" placeholder="Автор цитаты">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" id="quotePage" placeholder="Номер страницы">
+                                </div>
+                                <button type="button" class="btn btn-outline-primary" data-action="add-quote">➕ Добавить</button>
+                            </form>
                         </section>
                     </div>
                 </div>

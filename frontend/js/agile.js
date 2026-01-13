@@ -66,7 +66,7 @@ function loadBoard(statuses, authors, books) {
             column.addEventListener('drop', handleDrop);
 
             const booksInStatus = books.filter(book => book.status_id === status.id);
-            console.log(booksInStatus)
+
             booksInStatus.forEach(book => {
                 const card = document.createElement('div');
                 card.className = 'kanban-card';

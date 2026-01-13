@@ -18,7 +18,6 @@
                     alert('Успешный вход! User ID: ' + response.data.user_id);
                     // Перенаправление или загрузка книг
                     const books = await apiClient.getBooks();
-                    console.log('Books:', books);
                 } catch (error) {
                     alert('Ошибка входа: ' + error.message);
                 }
@@ -35,7 +34,6 @@
                     alert('Успешный вход! User ID: ' + response.data.user_id);
                     // Перенаправление или загрузка книг
                     const books = await apiClient.getBooks();
-                    console.log('Books:', books);
                 } catch (error) {
                     alert('Ошибка входа: ' + error.message);
                 }

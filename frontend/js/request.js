@@ -18,11 +18,12 @@ async function fetchWithAuth(url, options = {}) {
 
     if (response.status === 401) {
         try {
-            const newToken = await refreshToken();
+            await refreshToken();
+            token = getAccessToken();
             response = await fetch(url, {
                 ...options,
                 headers: {
-                    'Authorization': `Bearer ${newToken}`,
+                    'Authorization': `Bearer ${token}`,
                     ...(options.headers || {})
                 }
             });

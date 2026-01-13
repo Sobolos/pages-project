@@ -97,6 +97,22 @@ class AuthService
         }
     }
 
+    public function refreshToken(string $refreshToken): array
+    {
+        $decoded = $this->decodeJwt($refreshToken);
+        if (isset($decoded['exp']) && $decoded['exp'] < time()) {
+            throw new \RuntimeException('Refresh token expired');
+        }
+
+        $userId = (int)$decoded['sub'] ?? 0;
+        $user = $this->userRepository->findById($userId);
+        if (!$user) {
+            throw new \RuntimeException('User not found');
+        }
+
+        return $this->generateTokens($user);
+    }
+
     private function generateTokens(User $user): array
     {
         $payload = [

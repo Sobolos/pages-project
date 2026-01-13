@@ -69,11 +69,10 @@ function setupAutocomplete(element) {
     if (!url) return;
 
     const fetchSuggestions = async (query, currentAuthorIndex = 0) => {
-        console.log(query)
     }
 
     element.addEventListener('input', () => {
-        console.log(element.nodeName);
+
         let tag = element.nodeName;
         let query = '';
 
@@ -93,7 +92,7 @@ function setupAutocomplete(element) {
     });
 
     element.addEventListener('focus', () => {
-        console.log(element.nodeName);
+
         let tag = element.nodeName;
         let query = '';
 

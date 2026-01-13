@@ -51,7 +51,7 @@ class Note
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -60,5 +60,17 @@ class Note
     {
         $this->content = $content;
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $param): self
+    {
+        $this->updatedAt = $param;
+        return $this;
+    }
+
+    public function setId(int $lastInsertId): self
+    {
+        $this->id = $lastInsertId;
+        return $this;
     }
 }

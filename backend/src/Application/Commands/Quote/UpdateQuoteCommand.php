@@ -24,10 +24,12 @@ class UpdateQuoteCommand
             'user_id' => $quoteDto->userId,
             'content' => $quoteDto->content,
             'page_number' => $quoteDto->pageNumber,
+            'id' => $quoteDto->id,
         ];
 
         $errors = $this->validator->validate($data, [
             'id' => ['required', 'positive_int'],
+            'book_id' => ['required', 'positive_int'],
             'user_id' => ['required', 'positive_int'],
             'content' => ['required', 'string'],
             'page_number' => ['required', 'positive_int'],

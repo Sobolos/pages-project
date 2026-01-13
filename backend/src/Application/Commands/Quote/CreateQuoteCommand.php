@@ -57,6 +57,7 @@ class CreateQuoteCommand
         );
 
         $this->quoteRepository->save($quote);
+        $quote->setId($this->quoteRepository->pdo->lastInsertId());
 
 
         $bookTitle = $this->bookRepository->getTitleById($quoteDto->bookId);

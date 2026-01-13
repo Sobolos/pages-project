@@ -162,6 +162,7 @@ class ApiRequestHandler
                 $token = preg_replace('/^Bearer\s+/', '', $token);
                 $userId = $this->authService->validateToken($token);
                 if (!$userId) {
+                    http_response_code(401);
                     return ['error' => 'Unauthorized', 'uri' => $uri, 'code' => 401];
                 }
             }
@@ -199,6 +200,16 @@ class ApiRequestHandler
                     'status' => 'success',
                     'data' => $tokens
                 ];
+            }
+
+            if (preg_match('#^/api/token/refresh#', $uri) && $method === 'POST') {
+                $refreshToken = $data['refresh_token'] ?? '';
+                try {
+                    $tokens = $this->authService->refreshToken($refreshToken);
+                    return ['status' => 'success', 'data' => $tokens];
+                } catch (\RuntimeException $e) {
+                    return ['error' => $e->getMessage(), 'code' => 403];
+                }
             }
             #<<< Auth
 
@@ -502,10 +513,10 @@ class ApiRequestHandler
 
             if (preg_match('#^/api/quotes#', $uri) && $method === 'POST') {
                 $quoteDto = new QuoteDto(
-                    content: (int)($data['book_id'] ?? 0),
+                    content: $data['content'],
                     userId: $userId,
                     pageNumber: (int)($data['page_number']),
-                    bookId: $data['book_id'],
+                    bookId: (int)($data['book_id'] ?? 0),
                 );
 
                 $quote = $this->createQuoteCommand->execute($quoteDto);
@@ -521,10 +532,11 @@ class ApiRequestHandler
 
             if (preg_match('#^/api/quotes/(\d+)#', $uri, $matches) && $method === 'PUT') {
                 $quoteDto = new QuoteDto(
-                    content: (int)($data['book_id'] ?? 0),
+                    content: $data['content'],
                     userId: $userId,
                     pageNumber: (int)($data['page_number']),
-                    bookId: $data['book_id'],
+                    bookId: (int)($data['book_id'] ?? 0),
+                    id: (int)$matches[1],
                 );
 
                 $quote = $this->updateQuoteCommand->execute($quoteDto);
@@ -726,10 +738,13 @@ class ApiRequestHandler
                 return ['status' => 'success', 'data' => []];
             }
 
+            http_response_code(404);
             return ['error' => 'Not Found', 'uri' => $uri, 'code' => 404];
         } catch (\InvalidArgumentException $e) {
+            http_response_code(400);
             return ['error' => 'Validation failed', 'details' => json_decode($e->getMessage(), true), 'code' => 400, 'trace' => $e->getTraceAsString()];
         } catch (\RuntimeException $e) {
+            http_response_code(403);
             return ['error' => $e->getMessage(), 'trace' => $e->getTrace(), 'code' => 403];
         }
     }

@@ -185,7 +185,6 @@ document.getElementById('saveShelfBtn').addEventListener('click', async () => {
             body: JSON.stringify({ name: name })
         });
 
-        console.log(response)
         if (response.status === 'success') {
             bootstrap.Modal.getInstance(document.getElementById('add-shelf-modal')).hide();
             init();

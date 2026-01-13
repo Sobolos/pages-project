@@ -71,4 +71,10 @@ class Quote
         $this->pageNumber = $pageNumber;
         $this->updatedAt = new \DateTimeImmutable();
     }
+
+    public function setId(int $lastInsertId): self
+    {
+        $this->id = $lastInsertId;
+        return $this;
+    }
 }

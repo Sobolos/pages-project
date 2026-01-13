@@ -36,6 +36,4 @@ try {
     exit;
 }
 
-
-http_response_code(isset($response['error']) ? 404 : 200);
 echo json_encode($response, JSON_UNESCAPED_SLASHES);

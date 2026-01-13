@@ -49,7 +49,7 @@ class CreateNoteCommand
         );
 
         $this->noteRepository->save($note);
-        $this->noteRepository->pdo->lastInsertId();
+        $note->setId($this->noteRepository->pdo->lastInsertId());
 
         $this->historyService->generateNoteAddedEvent($note, $noteDto->bookId);
 
