@@ -248,7 +248,9 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
         bootstrap.Modal.getInstance(document.getElementById('add-book-modal')).hide();
         init(); // Перезагружаем данные
         newAuthors = []; // Сбрасываем массив новых авторов
+        selectedAuthors = []; // Сбрасываем выбранных авторов
     } catch (error) {
+        selectedAuthors = [];
         console.error('Ошибка создания книги', error);
         alert('Ошибка создания книги');
     }
