@@ -37,6 +37,15 @@ class PdoUserRepository extends PdoRepository implements UserRepositoryInterface
         return $row ? $this->mapper->toEntity($row) : null;
     }
 
+    public function findByLogin(string $login): ?User
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE name = :login');
+        $stmt->execute(['login' => $login]);
+        $row = $stmt->fetch();
+
+        return $row ? $this->mapper->toEntity($row) : null;
+    }
+
     public function findAllWithFilter(array $filters): array
     {
         $query = 'SELECT * FROM users WHERE 1=1';

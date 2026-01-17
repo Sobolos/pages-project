@@ -14,6 +14,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         localStorage.setItem('refresh_token', data.data.refresh_token);
         window.location.href = '/index.html';
     } else {
-        alert('Неверные учетные данные');
+        const errorMessage = document.getElementById('error');
+        errorMessage.classList.remove('d-none');
     }
 });

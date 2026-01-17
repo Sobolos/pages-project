@@ -10,6 +10,8 @@ use App\Application\Dto\StatusDto;
 use App\Application\Dto\UserDto;
 use App\Config\jwt;
 use App\Domain\Entities\User;
+use App\Domain\Exceptions\EmailRegistredException;
+use App\Domain\Exceptions\LoginTakenException;
 use App\Domain\Interfaces\HistoryGeneratorServiceInterface;
 use App\Domain\Interfaces\Repositories\UserRepositoryInterface;
 use App\Domain\ValueObjects\Color;
@@ -32,8 +34,21 @@ class AuthService
         $this->jwtSecret = jwt::JWT_SECRET;
     }
 
+    /**
+     * @throws EmailRegistredException
+     * @throws LoginTakenException
+     */
     public function register(UserDto $userDto): array
     {
+        $existingUserByEmail = $this->userRepository->findByEmail($userDto->email);
+        if ($existingUserByEmail) {
+            throw new EmailRegistredException('User email already registered');
+        }
+        $existingUserByName = $this->userRepository->findByEmail($userDto->name);
+        if ($existingUserByName) {
+            throw new LoginTakenException('User name already taken');
+        }
+
         $user = new User(
             id: 0,
             name: $userDto->name,

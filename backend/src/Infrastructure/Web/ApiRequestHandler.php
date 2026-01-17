@@ -53,6 +53,8 @@ use App\Application\Queries\GetShelvesQuery;
 use App\Application\Queries\GetStatusesQuery;
 use App\Config\ProtectedRoutes;
 use App\Domain\Entities\Author;
+use App\Domain\Exceptions\EmailRegistredException;
+use App\Domain\Exceptions\LoginTakenException;
 use App\Domain\ValueObjects\Color;
 use App\Infrastructure\Services\AuthService;
 
@@ -177,8 +179,13 @@ class ApiRequestHandler
 
                 try {
                     $tokens = $this->registerUserCommand->execute($userDto);
-                } catch (\Throwable $e) {
-                    return ['status' => 'error', 'message' => $e->getMessage()];
+                } catch (EmailRegistredException $e) {
+                    return ['status' => 'error', 'message' => 'Адрес электронной почты уже зарегистрирован'];
+                } catch (LoginTakenException $e) {
+                    return ['status' => 'error', 'message' => 'Имя пользователя уже занято'];
+                }
+                catch (\Throwable $e) {
+                    return ['status' => 'error', 'message' => 'Произошла ошибка при регистрации'];
                 }
 
 
