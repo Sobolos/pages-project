@@ -1,7 +1,11 @@
+// Глобальные переменные (предполагается, что они объявлены где-то выше)
+let agileStatuses = [];
+let agileAuthors = [];
+
 // Загрузка Agile-доски
 function loadBoard(statuses, authors, books) {
     try {
-        agileStatuses = statuses.sort((a, b) => a.position - b.position); // Sort statuses by position
+        agileStatuses = statuses.sort((a, b) => a.position - b.position);
         agileAuthors = authors;
         const board = document.getElementById('kanbanBoard');
         const loading = document.getElementById('loading_kanban');
@@ -9,30 +13,21 @@ function loadBoard(statuses, authors, books) {
         board.style.display = 'flex';
         board.innerHTML = '';
 
-        statuses.forEach((status, index) => {
+        statuses.forEach((status) => {
             const column = document.createElement('div');
             column.className = 'kanban-column';
             column.style.background = status.color;
             column.dataset.statusId = status.id;
-            column.draggable = true; // Make entire column draggable
+            column.draggable = true;
 
-            // Create title container for header
             const titleContainer = document.createElement('div');
             titleContainer.className = 'd-flex align-items-center justify-content-between p-2 kanban-column-title';
 
-            // Drag handle (centered)
-            // const dragHandle = document.createElement('div');
-            // dragHandle.className = 'drag-handle';
-            // dragHandle.innerHTML = '☰';
-            // titleContainer.appendChild(dragHandle);
-
-            // Title
             const title = document.createElement('h5');
             title.textContent = status.name;
             title.className = 'status-title mb-0';
             titleContainer.appendChild(title);
 
-            // Button group for edit and delete (aligned right)
             const buttonGroup = document.createElement('div');
             buttonGroup.className = 'd-flex';
 
@@ -51,7 +46,7 @@ function loadBoard(statuses, authors, books) {
             titleContainer.appendChild(buttonGroup);
             column.appendChild(titleContainer);
 
-            // Column drag-and-drop events
+            // События перетаскивания колонок
             column.addEventListener('dragstart', handleColumnDragStart);
             column.addEventListener('dragend', handleDragEnd);
             column.addEventListener('dragover', e => e.preventDefault());
@@ -59,7 +54,7 @@ function loadBoard(statuses, authors, books) {
             column.addEventListener('dragleave', () => column.classList.remove('dropzone-highlight'));
             column.addEventListener('drop', handleColumnDrop);
 
-            // Book drag-and-drop events
+            // События перетаскивания книг
             column.addEventListener('dragover', e => e.preventDefault());
             column.addEventListener('dragenter', () => column.classList.add('dropzone-highlight'));
             column.addEventListener('dragleave', () => column.classList.remove('dropzone-highlight'));
@@ -72,12 +67,13 @@ function loadBoard(statuses, authors, books) {
                 card.className = 'kanban-card';
                 card.draggable = true;
                 card.dataset.bookId = book.id;
-                card.innerHTML = `<div class="row">
-                                    <div class="col-3 p-2"><img src="${book.cover_url}" alt="${book.title}"></div>
-                                    <div class="col-9 p-2"><p>${book.title}</p></div>
-                                  </div>`;
 
-                if (book.cover_url === null) {
+                if (book.cover_url) {
+                    card.innerHTML = `<div class="row">
+                                        <div class="col-3 p-2"><img src="${book.cover_url}" alt="${book.title}"></div>
+                                        <div class="col-9 p-2"><p>${book.title}</p></div>
+                                      </div>`;
+                } else {
                     card.innerHTML = `<div class="row">
                                         <div class="col-12"><p>${book.title}</p></div>
                                       </div>`;
@@ -97,33 +93,35 @@ function loadBoard(statuses, authors, books) {
     }
 }
 
-// Обработчики Drag-and-Drop для карточек
+// ────────────────────────────────────────────────
+// Обработчики Drag-and-Drop для карточек книг
+// ────────────────────────────────────────────────
+
 function handleDragStart(e) {
-    e.stopPropagation(); // Prevent column dragstart from firing
+    e.stopPropagation();
     e.dataTransfer.setData('text/plain', e.target.dataset.bookId);
-    e.dataTransfer.setData('type', 'book'); // Indicate this is a book drag
+    e.dataTransfer.setData('type', 'book');
 }
 
-// Clean up visual states after drag ends (for both books and columns)
 function handleDragEnd(e) {
-    e.stopPropagation(); // Prevent bubbling
-    // Remove dropzone-highlight from all columns
+    e.stopPropagation();
     document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('dropzone-highlight'));
-    // Remove dragging class from the dragged element
-    const column = e.target.closest('.kanban-column') || e.target.closest('.kanban-card');
-    if (column) column.classList.remove('dragging');
+    const el = e.target.closest('.kanban-column') || e.target.closest('.kanban-card');
+    if (el) el.classList.remove('dragging');
 }
 
 async function handleDrop(e) {
     e.preventDefault();
-    e.stopPropagation(); // Prevent column drop handler from firing
+    e.stopPropagation();
+
     const type = e.dataTransfer.getData('type');
-    if (type !== 'book') return; // Only handle book drops
+    if (type !== 'book') return;
 
     const bookId = e.dataTransfer.getData('text/plain');
-    const target = e.target.closest('.kanban-column');
-    if (!target) return; // Ensure drop target is a column
-    const newStatusId = target.dataset.statusId;
+    const targetColumn = e.target.closest('.kanban-column');
+    if (!targetColumn) return;
+
+    const newStatusId = targetColumn.dataset.statusId;
 
     try {
         await fetchWithAuth(`${API_BASE}/book-status/${bookId}`, {
@@ -131,54 +129,62 @@ async function handleDrop(e) {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({status_id: newStatusId})
         });
+
         const card = document.querySelector(`.kanban-card[data-book-id="${bookId}"]`);
-        target.appendChild(card);
+        if (card) targetColumn.appendChild(card);
     } catch (error) {
         console.error(error);
         alert('Ошибка перемещения книги');
     }
-    target.classList.remove('dropzone-highlight');
+
+    targetColumn.classList.remove('dropzone-highlight');
 }
 
-// Обработчики Drag-and-Drop для колонок
+// ────────────────────────────────────────────────
+// Обработчики Drag-and-Drop для колонок (статусов)
+// ────────────────────────────────────────────────
+
 function handleColumnDragStart(e) {
-    // Prevent column drag if initiated from a book card
     if (e.target.closest('.kanban-card')) {
         e.stopPropagation();
         return;
     }
-    e.stopPropagation(); // Prevent other drag events
+    e.stopPropagation();
+
     const column = e.target.closest('.kanban-column');
+    if (!column) return;
+
     e.dataTransfer.setData('text/plain', column.dataset.statusId);
-    e.dataTransfer.setData('type', 'column'); // Indicate this is a column drag
-    column.classList.add('dragging'); // Add dragging class for visual feedback
+    e.dataTransfer.setData('type', 'column');
+    column.classList.add('dragging');
 }
 
 async function handleColumnDrop(e) {
     e.preventDefault();
-    e.stopPropagation(); // Prevent book drop handler from firing
+    e.stopPropagation();
+
     const type = e.dataTransfer.getData('type');
-    if (type !== 'column') return; // Only handle column drops
+    if (type !== 'column') return;
 
     const draggedStatusId = e.dataTransfer.getData('text/plain');
-    const target = e.target.closest('.kanban-column');
-    if (!target) return; // Ensure drop target is a column
-    const targetStatusId = target.dataset.statusId;
+    const targetColumn = e.target.closest('.kanban-column');
+    if (!targetColumn) return;
+
+    const targetStatusId = targetColumn.dataset.statusId;
 
     if (draggedStatusId === targetStatusId) {
-        target.classList.remove('dropzone-highlight');
-        return; // No change if dropped on itself
+        targetColumn.classList.remove('dropzone-highlight');
+        return;
     }
 
     try {
-        // Reorder statuses array
-        const draggedIndex = statuses.findIndex(s => s.id == draggedStatusId);
-        const targetIndex = statuses.findIndex(s => s.id == targetStatusId);
-        const [draggedStatus] = statuses.splice(draggedIndex, 1);
-        statuses.splice(targetIndex, 0, draggedStatus);
+        const draggedIndex = agileStatuses.findIndex(s => s.id == draggedStatusId);
+        const targetIndex = agileStatuses.findIndex(s => s.id == targetStatusId);
 
-        // Update positions in the backend
-        const updatedPositions = statuses.map((status, index) => ({
+        const [draggedStatus] = agileStatuses.splice(draggedIndex, 1);
+        agileStatuses.splice(targetIndex, 0, draggedStatus);
+
+        const updatedPositions = agileStatuses.map((status, index) => ({
             id: status.id,
             position: index
         }));
@@ -189,77 +195,120 @@ async function handleColumnDrop(e) {
             body: JSON.stringify(updatedPositions)
         });
 
-        // Re-render the board
-        init();
+        init(); // или loadBoard(...) — как у тебя вызывается обновление
     } catch (error) {
         console.error(error);
         alert('Ошибка перемещения колонки');
     }
-    target.classList.remove('dropzone-highlight');
+
+    targetColumn.classList.remove('dropzone-highlight');
     document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('dragging'));
 }
 
-// Open the status modal for editing
+// ────────────────────────────────────────────────
+// Модальное окно статуса — создание / редактирование
+// ────────────────────────────────────────────────
+
+// Один общий обработчик на кнопку "Сохранить"
+document.getElementById('saveStatusBtn').addEventListener('click', async () => {
+    const name = document.getElementById('status-name').value.trim();
+    const color = document.getElementById('status-color').value;
+
+    if (!name) {
+        alert('Название обязательно');
+        return;
+    }
+
+    const btn = document.getElementById('saveStatusBtn');
+    const mode = btn.dataset.mode || 'create';
+    const statusId = btn.dataset.statusId || null;
+
+    let url = `${API_BASE}/statuses`;
+    let method = 'POST';
+    let body = { name, color, hide_from_agile: false };
+
+    if (mode === 'edit' && statusId) {
+        url += `/${statusId}`;
+        method = 'PUT';
+    } else {
+        body.position = agileStatuses.length + 1;
+    }
+
+    try {
+        await fetchWithAuth(url, {
+            method,
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('add-status-modal'));
+        if (modal) modal.hide();
+
+        init();
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка сохранения статуса');
+    }
+});
+
+// Очистка модалки при закрытии (чтобы поля и data-атрибуты сбрасывались всегда)
+const statusModalElement = document.getElementById('add-status-modal');
+statusModalElement.addEventListener('hidden.bs.modal', () => {
+    document.getElementById('status-name').value = '';
+    document.getElementById('status-color').value = '#FFFAAA';
+    document.getElementById('color-preview').style.background = 'linear-gradient(45deg, #fcbeec, #a9dadf, #6cffce)';
+
+    const saveBtn = document.getElementById('saveStatusBtn');
+    saveBtn.textContent = 'Создать';
+    saveBtn.dataset.mode = 'create';
+    saveBtn.dataset.statusId = '';
+});
+
 function openEditStatusModal(status) {
-    const modal = new bootstrap.Modal(document.getElementById('add-status-modal'));
-    const statusNameInput = document.getElementById('status-name');
-    const statusColorInput = document.getElementById('status-color');
-    const saveButton = document.getElementById('saveStatusBtn');
+    // Заполняем поля
+    document.getElementById('status-name').value = status.name;
+    document.getElementById('status-color').value = status.color;
+    document.getElementById('color-preview').style.background = status.color;
 
-    // Populate modal fields
-    statusNameInput.value = status.name;
-    statusColorInput.value = status.color;
+    // Настройка кнопки
+    const saveBtn = document.getElementById('saveStatusBtn');
+    saveBtn.textContent = 'Сохранить';
+    saveBtn.dataset.mode = 'edit';
+    saveBtn.dataset.statusId = status.id;
 
-    // Store original button state
-    const originalButtonText = saveButton.textContent;
-
-    // Remove all existing event listeners to prevent duplication
-    const newSaveButton = saveButton.cloneNode(true);
-    saveButton.parentNode.replaceChild(newSaveButton, saveButton);
-
-    // Add new click handler for updating
-    newSaveButton.textContent = 'Сохранить';
-    newSaveButton.addEventListener('click', async () => {
-        const name = statusNameInput.value;
-        const color = statusColorInput.value;
-        if (!name) return alert('Название обязательно');
-
-        try {
-            await fetchWithAuth(`${API_BASE}/statuses/${status.id}`, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ name: name, color: color, hide_from_agile: false})
-            });
-            modal.hide();
-            init();
-        } catch (error) {
-            console.error(error);
-            alert('Ошибка обновления статуса');
-        }
-    });
-
-    // Reset modal on close
-    const modalElement = document.getElementById('add-status-modal');
-    modalElement.addEventListener('hidden.bs.modal', () => {
-        // Clear inputs
-        statusNameInput.value = '';
-        statusColorInput.value = '#FFFAAA';
-        // Restore original button text
-        newSaveButton.textContent = originalButtonText;
-    }, { once: true });
-
+    const modal = new bootstrap.Modal(statusModalElement);
     modal.show();
 }
 
-// Delete a status
-async function deleteStatus(statusId, authors, books) {
-    if (!confirm('Вы уверены, что хотите удалить этот статус?')) return;
+function openCreateStatusModal() {
+    // Заполняем поля (хотя и очистка при hidden.bs.modal сделает это, но для верности)
+    document.getElementById('status-name').value = '';
+    document.getElementById('status-color').value = '#FFFAAA';
+    document.getElementById('color-preview').style.background = '#FFFAAA';
+
+    // Настройка кнопки
+    const saveBtn = document.getElementById('saveStatusBtn');
+    saveBtn.textContent = 'Создать';
+    saveBtn.dataset.mode = 'create';
+    saveBtn.dataset.statusId = '';
+
+    const modal = new bootstrap.Modal(statusModalElement);
+    modal.show();
+}
+
+// ────────────────────────────────────────────────
+// Удаление статуса
+// ────────────────────────────────────────────────
+
+async function deleteStatus(statusId) {
+    if (!confirm('Вы уверены, что хотите удалить этот статус? Книги в этом статусе останутся без статуса.')) {
+        return;
+    }
 
     try {
         await fetchWithAuth(`${API_BASE}/statuses/${statusId}`, {
             method: 'DELETE'
         });
-
         init();
     } catch (error) {
         console.error(error);
@@ -267,18 +316,9 @@ async function deleteStatus(statusId, authors, books) {
     }
 }
 
-document.getElementById('saveStatusBtn').addEventListener('click', async () => {
-    const name = document.getElementById('status-name').value;
-    const color = document.getElementById('status-color').value;
-    if (!name) return alert('Название обязательно');
-
-    const request = JSON.stringify({ name: name, color: color, hide_from_agile: false, position: statuses.length+1})
-
-    try {
-        await fetchWithAuth(`${API_BASE}/statuses`, {headers: { 'Content-Type': 'application/json' },method: 'POST', body: request});
-        bootstrap.Modal.getInstance(document.getElementById('add-status-modal')).hide();
-        init();
-    } catch (error) {
-        alert('Ошибка создания статуса\n' + error);
-    }
-});
+// ────────────────────────────────────────────────
+// Остальные функции (предполагается, что они уже есть в проекте)
+// ────────────────────────────────────────────────
+// openBookModal(bookId)
+// fetchWithAuth(url, options)
+// init() — функция инициализации / загрузки данных
