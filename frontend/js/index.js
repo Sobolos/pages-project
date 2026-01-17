@@ -63,3 +63,61 @@ function setVariables(
     books = booksArg;
     shelves = shelvesArg;
 }
+
+// Обновляем цвет статуса при выборе из выпадающего блока
+document.addEventListener('DOMContentLoaded', function() {
+    const colorPreview = document.getElementById('color-preview');
+    const colorDropdown = document.getElementById('color-dropdown');
+    const colorOptions = document.querySelectorAll('.color-option');
+    const statusColor = document.getElementById('status-color');
+    const selectedColor = document.getElementById('selected-color');
+    
+    // Показываем/скрываем выпадающий блок при клике на превью
+    if (colorPreview) {
+        colorPreview.addEventListener('click', function(e) {
+            e.stopPropagation();
+            colorDropdown.style.display = colorDropdown.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+    
+    // Закрываем выпадающий блок при клике вне его
+    document.addEventListener('click', function(e) {
+        if (colorDropdown.style.display === 'block') {
+            // Проверяем, что клик был не по превью и не по выпадающему блоку
+            if (!colorPreview.contains(e.target) && !colorDropdown.contains(e.target)) {
+                colorDropdown.style.display = 'none';
+            }
+        }
+    });
+    
+    // Предотвращаем закрытие при клике на инпут цвета
+    const colorInput = document.getElementById('status-color');
+    if (colorInput) {
+        colorInput.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    // Обработка выбора цвета из кирпичиков
+    colorOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const color = this.getAttribute('data-color');
+            statusColor.value = color;
+            selectedColor.value = color;
+            colorPreview.style.background = color;
+            colorDropdown.style.display = 'none';
+        });
+    });
+    
+    // Обработка выбора цвета из инпута
+    statusColor.addEventListener('input', function() {
+        const color = this.value;
+        selectedColor.value = color;
+        colorPreview.style.background = color;
+    });
+    
+    // Устанавливаем начальное значение цвета
+    if (statusColor && selectedColor && colorPreview) {
+        colorPreview.style.background = 'linear-gradient(45deg, #fcbeec, #a9dadf, #6cffce)';
+    }
+});

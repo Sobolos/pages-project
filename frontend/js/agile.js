@@ -72,7 +72,17 @@ function loadBoard(statuses, authors, books) {
                 card.className = 'kanban-card';
                 card.draggable = true;
                 card.dataset.bookId = book.id;
-                card.innerHTML = `${book.cover ? `<img src="${book.cover}" alt="${book.title}">` : ''}<p>${book.title}</p>`;
+                card.innerHTML = `<div class="row">
+                                    <div class="col-3 p-2"><img src="${book.cover_url}" alt="${book.title}"></div>
+                                    <div class="col-9 p-2"><p>${book.title}</p></div>
+                                  </div>`;
+
+                if (book.cover_url === null) {
+                    card.innerHTML = `<div class="row">
+                                        <div class="col-12"><p>${book.title}</p></div>
+                                      </div>`;
+                }
+
                 card.addEventListener('dragstart', handleDragStart);
                 card.addEventListener('dragend', handleDragEnd);
                 card.addEventListener('click', () => openBookModal(book.id));

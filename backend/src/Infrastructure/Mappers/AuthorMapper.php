@@ -29,7 +29,7 @@ class AuthorMapper extends BaseMapper
             'name' => $author->getName(),
             'user_id' => $author->getUserId(),
             'created_at' => $author->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $author->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'updated_at' => $author->getUpdatedAt()?->format('Y-m-d H:i:s'),
         ];
     }
 }

@@ -577,6 +577,7 @@ class ApiRequestHandler
                             'current_page' => $book->getCurrentPage(),
                             'physical_pages' => $book->getPhysicalPages(),
                             'epub_url' => $book->getEpubUrl(),
+                            'cover_url' => $book->getCoverUrl(),
                         ],
                         $books
                     ),

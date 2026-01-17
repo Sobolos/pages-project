@@ -50,10 +50,10 @@ class AuthService
 
         // Создать дефолтные статусы через команду
         $defaultStatuses = [
-            new StatusDto('Планирую', $userId, new Color('#FF0000'), false, 0),
-            new StatusDto('Читаю', $userId, new Color('#00FF00'), false, 1),
-            new StatusDto('Прочитано', $userId, new Color('#0000FF'), false, 2),
-            new StatusDto('Отменено', $userId, new Color('#808080'), false, 3),
+            new StatusDto('Планирую', $userId, new Color('#ff7070'), false, 0),
+            new StatusDto('Читаю', $userId, new Color('#bababa'), false, 1),
+            new StatusDto('Прочитано', $userId, new Color('#c7d5ff'), false, 2),
+            new StatusDto('Отменено', $userId, new Color('#9eff9e'), false, 3),
         ];
 
         foreach ($defaultStatuses as $statusData) {

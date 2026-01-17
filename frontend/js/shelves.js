@@ -90,7 +90,7 @@ async function loadBooksForShelf(shelfId, books) {
 
             card.innerHTML = `
                 <div class="card book-card">
-                    ${book.cover ? `<img src="${book.cover}" class="card-img-top book-cover mx-auto mt-3" alt="${book.title}">` : ''}
+                    ${book.cover_url ? `<img src="${book.cover_url}" class="card-img-top book-cover mx-auto mt-3" alt="${book.title}">` : ''}
                     <div class="card-body text-center" onclick="openBookModal(${book.id})">
                         <h5 class="card-title">${book.title}</h5>
                         <p class="card-text">${authors ? authors : 'Неизвестный автор'}</p>

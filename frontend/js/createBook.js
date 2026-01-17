@@ -242,8 +242,7 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
 
         await fetchWithAuth(`${API_BASE}/books`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: data
+            body: formData
         });
         bootstrap.Modal.getInstance(document.getElementById('add-book-modal')).hide();
         init(); // Перезагружаем данные

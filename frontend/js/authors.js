@@ -9,6 +9,72 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Показать форму добавления автора
+function showAddAuthorForm() {
+    const addRow = document.getElementById('add-author-row');
+    const formRow = document.getElementById('add-author-form');
+    if (addRow && formRow) {
+        addRow.style.display = 'none';
+        formRow.style.display = 'table-row';
+        const input = document.getElementById('new-author-name');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
+        
+        // Убедимся, что tbody не перезаписывается при загрузке
+        const tbody = document.getElementById('authorsList');
+        if (tbody && !tbody.querySelector('#add-author-form')) {
+            const formRowClone = formRow.cloneNode(true);
+            formRowClone.style.display = 'table-row';
+            tbody.appendChild(formRowClone);
+        }
+    }
+}
+
+// Скрыть форму добавления автора
+function cancelAddAuthor() {
+    document.getElementById('add-author-row').style.display = 'table-row';
+    document.getElementById('add-author-form').style.display = 'none';
+    document.getElementById('new-author-name').value = '';
+}
+
+// Добавление нового автора
+async function addAuthor() {
+    const newName = document.getElementById('new-author-name').value.trim();
+    
+    if (!newName) {
+        alert('Имя автора не может быть пустым');
+        return;
+    }
+    
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/authors`, {
+            method: 'POST',
+            body: JSON.stringify({ name: newName })
+        });
+        
+        if (response.status === 'success') {
+            // Добавляем в глобальный массив authors
+            authors.push(response.data);
+            
+            // Перезагружаем список авторов
+            loadAuthorsList();
+            
+            // Сбрасываем форму
+            cancelAddAuthor();
+            
+            // Показываем уведомление
+            alert('Автор успешно добавлен');
+        } else {
+            throw new Error(response.error || 'Не удалось добавить автора');
+        }
+    } catch (error) {
+        console.error('Ошибка при добавлении автора', error);
+        alert('Не удалось добавить автора: ' + error.message);
+    }
+}
+
 // Загрузка списка авторов
 async function loadAuthorsList() {
     try {
@@ -18,7 +84,23 @@ async function loadAuthorsList() {
         
         if (response.status === 'success') {
             const authorsList = document.getElementById('authorsList');
+            
+            // Сохраняем форму добавления, если она существует
+            const addAuthorForm = authorsList.querySelector('#add-author-form');
+            
+            // Очищаем содержимое, кроме строки добавления
+            const addAuthorRow = authorsList.querySelector('#add-author-row');
             authorsList.innerHTML = '';
+            
+            // Восстанавливаем строку добавления
+            if (addAuthorRow) {
+                authorsList.appendChild(addAuthorRow);
+            }
+            
+            // Восстанавливаем форму добавления
+            if (addAuthorForm) {
+                authorsList.appendChild(addAuthorForm);
+            }
             
             response.data.forEach(author => {
                 const row = document.createElement('tr');

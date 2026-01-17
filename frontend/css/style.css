@@ -20,6 +20,8 @@
     cursor: move;
     box-shadow: 6px 6px 8px 0px rgba(34, 60, 80, 0.2);
     border: 1px solid rgba(0, 0, 0, 0.125);
+    overflow-y: scroll;
+    scrollbar-width: none;
 }
 
 .kanban-column.dragging {
@@ -71,6 +73,7 @@
 .shelf-card,
 .book-card {
     transition: transform 0.2s ease;
+    padding: 1rem;
 }
 
 .shelf-card:hover,
@@ -87,7 +90,7 @@
 
 .book-cover {
     max-height: 250px;
-    object-fit: cover;
+    object-fit: scale-down;
     border-radius: 0.25rem;
 }
 
