@@ -54,7 +54,7 @@ class EmailService
             $mail->Password   = $this->smtpPassword;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port       = $this->smtpPort;
-            $mail->Timeout = 10;
+            $mail->Timeout = 20;
             $mail->SMTPDebug = 2;
 
             // Настройка кодировки
