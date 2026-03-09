@@ -5,6 +5,7 @@ FROM php:8.3-fpm
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     curl \
+    git \
     && docker-php-ext-install pdo pdo_pgsql
 
 # Установка Composer
@@ -22,6 +23,8 @@ RUN chown -R www-data:www-data /var/www/html
 # Скрипт для инициализации
 COPY docker/init.sh /usr/local/bin/init.sh
 RUN chmod +x /usr/local/bin/init.sh
+
+COPY .env.sample /var/www/html/.env.sample
 
 # Запускаем init.sh как entrypoint, а затем стартуем php-fpm
 ENTRYPOINT ["/usr/local/bin/init.sh"]

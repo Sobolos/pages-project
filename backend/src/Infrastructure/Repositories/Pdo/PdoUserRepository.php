@@ -69,7 +69,7 @@ class PdoUserRepository extends PdoRepository implements UserRepositoryInterface
         if ($this->findById($entity->getId())) {
             unset($data['created_at']);
             $stmt = $this->pdo->prepare(
-                'UPDATE users SET name = :name, email = :email, password = :password, ' .
+                'UPDATE users SET name = :name, email = :email, password = :password, reset_token = :reset_token, reset_token_expiry = :reset_token_expiry, ' .
                 'updated_at = :updated_at WHERE id = :id'
             );
         } else {
@@ -97,6 +97,15 @@ class PdoUserRepository extends PdoRepository implements UserRepositoryInterface
     {
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE name = :name');
         $stmt->execute(['name' => $name]);
+        $row = $stmt->fetch();
+
+        return $row ? $this->mapper->toEntity($row) : null;
+    }
+
+    public function findByResetToken(string $token): ?User
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE reset_token = :token');
+        $stmt->execute(['token' => $token]);
         $row = $stmt->fetch();
 
         return $row ? $this->mapper->toEntity($row) : null;

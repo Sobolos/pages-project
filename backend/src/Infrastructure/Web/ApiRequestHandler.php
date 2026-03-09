@@ -29,8 +29,10 @@ use App\Application\Commands\Status\DeleteStatusCommand;
 use App\Application\Commands\Status\ReorderStatusCommand;
 use App\Application\Commands\Status\UpdateStatusCommand;
 use App\Application\Commands\UpdateReadingProgressCommand;
+use App\Application\Commands\User\ForgotPasswordCommand;
 use App\Application\Commands\User\LoginUserCommand;
 use App\Application\Commands\User\RegisterUserCommand;
+use App\Application\Commands\User\ResetPasswordCommand;
 use App\Application\Dto\AuthorDto;
 use App\Application\Dto\BatchAuthorDto;
 use App\Application\Dto\CreateBookDto;
@@ -96,12 +98,16 @@ class ApiRequestHandler
     private ReorderStatusCommand $reorderStatusesCommand;
     private RegisterUserCommand $registerUserCommand;
     private LoginUserCommand $loginUserCommand;
+    private ForgotPasswordCommand $forgotPasswordCommand;
+    private ResetPasswordCommand $resetPasswordCommand;
 
     public function __construct()
     {
         $this->authService = new AuthService();
         $this->loginUserCommand = new LoginUserCommand();
         $this->registerUserCommand = new RegisterUserCommand();
+        $this->forgotPasswordCommand = new ForgotPasswordCommand();
+        $this->resetPasswordCommand = new ResetPasswordCommand();
 
         $this->createAuthorCommand = new CreateAuthorCommand();
         $this->batchCreateAuthorCommand = new BatchCreateAuthorCommand();
@@ -217,6 +223,27 @@ class ApiRequestHandler
                 } catch (\RuntimeException $e) {
                     return ['error' => $e->getMessage(), 'code' => 403];
                 }
+            }
+
+            if (preg_match('#^/api/forgot-password#', $uri) && $method === 'POST') {
+                $email = $data['email'] ?? '';
+                
+                if (empty($email)) {
+                    return ['status' => 'error', 'message' => 'Email обязателен'];
+                }
+                
+                return $this->forgotPasswordCommand->execute($email);
+            }
+
+            if (preg_match('#^/api/reset-password#', $uri) && $method === 'POST') {
+                $token = $data['token'] ?? '';
+                $newPassword = $data['password'] ?? '';
+                
+                if (empty($token) || empty($newPassword)) {
+                    return ['status' => 'error', 'message' => 'Токен и новый пароль обязательны'];
+                }
+                
+                return $this->resetPasswordCommand->execute($token, $newPassword);
             }
             #<<< Auth
 

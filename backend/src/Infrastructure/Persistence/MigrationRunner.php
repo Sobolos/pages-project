@@ -1,6 +1,7 @@
 <?php
 namespace App\Infrastructure\Persistence;
 
+use App\Infrastructure\Persistence\Migrations\AddResetTokenToUsersTable;
 use App\Infrastructure\Persistence\Migrations\CreateHistoryTable;
 use App\Infrastructure\Persistence\Migrations\CreateReadingProgressTable;
 use App\Infrastructure\Persistence\Migrations\CreateSettingsTable;
@@ -31,7 +32,8 @@ class MigrationRunner
             new CreateNotesQuotesTables(),
             new CreateHistoryTable(),
             new CreateSettingsTable(),
-            new CreateReadingProgressTable()
+            new CreateReadingProgressTable(),
+            new AddResetTokenToUsersTable(),
         ];
     }
 

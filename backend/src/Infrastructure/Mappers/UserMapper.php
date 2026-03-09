@@ -17,7 +17,9 @@ class UserMapper extends BaseMapper
             email: $row['email'],
             password: $row['password'],
             createdAt: new \DateTimeImmutable($row['created_at']),
-            updatedAt: new \DateTimeImmutable($row['updated_at'])
+            updatedAt: new \DateTimeImmutable($row['updated_at']),
+            resetToken: $row['reset_token'] ?? null,
+            resetTokenExpiry: isset($row['reset_token_expiry']) ? new \DateTimeImmutable($row['reset_token_expiry']) : null
         );
         $this->addToMap($entity, $entity->getId());
         return $entity;
@@ -32,6 +34,8 @@ class UserMapper extends BaseMapper
             'password' => $user->getPassword(),
             'created_at' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $user->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'reset_token' => $user->getResetToken(),
+            'reset_token_expiry' => $user->getResetTokenExpiry()?->format('Y-m-d H:i:s')
         ];
     }
 }
