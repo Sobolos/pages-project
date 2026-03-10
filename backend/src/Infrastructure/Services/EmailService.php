@@ -52,7 +52,7 @@ class EmailService
             $mail->SMTPAuth   = true;
             $mail->Username   = $this->smtpUsername;
             $mail->Password   = $this->smtpPassword;
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = $this->smtpPort;
             $mail->Timeout = 20;
             $mail->SMTPDebug = 2;
