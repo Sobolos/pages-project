@@ -1,5 +1,5 @@
-const API_BASE = 'http://localhost/api'; // замени при необходимости
-const BACKEND_BASE = 'http://localhost'; // замени при необходимости
+const API_BASE = 'http://localhost:8080/api'; // замени при необходимости
+const BACKEND_BASE = 'http://localhost:8080'; // замени при необходимости
 
 async function fetchWithAuth(url, options = {}) {
     let token = getAccessToken();
