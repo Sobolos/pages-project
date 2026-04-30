@@ -533,6 +533,7 @@ class ApiRequestHandler
                             'id' => $quote->getId(),
                             'book_id' => $quote->getBookId(),
                             'content' => $quote->getContent(),
+                            'author' => $quote->getAuthor(),
                             'page_number' => $quote->getPageNumber(),
                             'created_at' => $quote->getCreatedAt()->format('Y-m-d H:i:s'),
                         ],
@@ -550,6 +551,7 @@ class ApiRequestHandler
                     content: $data['content'],
                     userId: $userId,
                     pageNumber: (int)($data['page_number']),
+                    author: $data['author'],
                     bookId: (int)($data['book_id'] ?? 0),
                 );
 
@@ -559,6 +561,7 @@ class ApiRequestHandler
                     'data' => [
                         'id' => $quote->getId(),
                         'content' => $quote->getContent(),
+                        'author' => $quote->getAuthor(),
                         'page_number' => $quote->getPageNumber(),
                     ]
                 ];
@@ -569,6 +572,7 @@ class ApiRequestHandler
                     content: $data['content'],
                     userId: $userId,
                     pageNumber: (int)($data['page_number']),
+                    author: $data['author'],
                     bookId: (int)($data['book_id'] ?? 0),
                     id: (int)$matches[1],
                 );
@@ -579,6 +583,7 @@ class ApiRequestHandler
                     'data' => [
                         'id' => $quote->getId(),
                         'content' => $quote->getContent(),
+                        'author' => $quote->getAuthor(),
                         'page_number' => $quote->getPageNumber(),
                     ]
                 ];
@@ -653,7 +658,7 @@ class ApiRequestHandler
                 ];
             }
 
-            if (preg_match('#^/api/cover-book/(\d+)#', $uri) && $method === 'POST') {
+            if (preg_match('#^/api/cover-book/(\d+)#', $uri, $matches) && $method === 'POST') {
                 $bookId = (int)$matches[1];
 
                 if (empty($_FILES['cover']['tmp_name'])) {
@@ -661,7 +666,9 @@ class ApiRequestHandler
                     return ['error' => 'Cover file is required'];
                 }
 
-                $this->uploadBookCoverCommand->execute($userId, $bookId, $_FILES['cover']);
+                $this->uploadBookCoverCommand->execute($bookId, $userId, $_FILES['cover']);
+
+                return ['status' => 'success'];
             }
 
             if (preg_match('#^/api/epub-book/(\d+)#', $uri) && $method === 'POST') {
@@ -685,6 +692,8 @@ class ApiRequestHandler
                 $bookId = (int)$matches[1];
 
                 $this->removeBookEpubCommand->execute($userId, $bookId);
+
+                return ['status' => 'success'];
             }
 
             if (preg_match('#^/api/books#', $uri) && $method === 'POST') {

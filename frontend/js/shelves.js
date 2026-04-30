@@ -176,7 +176,7 @@ async function deleteShelf(shelfId) {
 // Сохранение сущностей
 document.getElementById('saveShelfBtn').addEventListener('click', async () => {
     const name = document.getElementById('shelf-name').value;
-    if (!name) return alert('Название обязательно');
+    if (!name) return
 
     try {
         let response = await fetchWithAuth(`${API_BASE}/shelves`, {
@@ -190,6 +190,6 @@ document.getElementById('saveShelfBtn').addEventListener('click', async () => {
             init();
         }
     } catch (error) {
-        alert('Ошибка создания полки');
+        console.log('Ошибка создания полки');
     }
 });

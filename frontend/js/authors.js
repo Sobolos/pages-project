@@ -44,7 +44,6 @@ async function addAuthor() {
     const newName = document.getElementById('new-author-name').value.trim();
     
     if (!newName) {
-        alert('Имя автора не может быть пустым');
         return;
     }
     
@@ -63,15 +62,11 @@ async function addAuthor() {
             
             // Сбрасываем форму
             cancelAddAuthor();
-            
-            // Показываем уведомление
-            alert('Автор успешно добавлен');
         } else {
             throw new Error(response.error || 'Не удалось добавить автора');
         }
     } catch (error) {
         console.error('Ошибка при добавлении автора', error);
-        alert('Не удалось добавить автора: ' + error.message);
     }
 }
 
@@ -120,7 +115,6 @@ async function loadAuthorsList() {
         }
     } catch (error) {
         console.error('Ошибка при загрузке авторов', error);
-        alert('Не удалось загрузить список авторов');
     }
 }
 
@@ -156,7 +150,6 @@ async function saveAuthor(authorId) {
     const newName = document.getElementById('edit-author-input').value.trim();
     
     if (!newName) {
-        alert('Имя автора не может быть пустым');
         return;
     }
     
@@ -185,7 +178,6 @@ async function saveAuthor(authorId) {
         }
     } catch (error) {
         console.error('Ошибка при обновлении автора', error);
-        alert('Не удалось обновить автора');
         loadAuthors(); // Восстанавливаем список в случае ошибки
     }
 }
@@ -215,7 +207,6 @@ async function deleteAuthor(authorId) {
         }
     } catch (error) {
         console.error('Ошибка при удалении автора', error);
-        alert('Не удалось удалить автора');
     }
 }
 

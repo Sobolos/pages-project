@@ -23,6 +23,7 @@ class UpdateQuoteCommand
             'book_id' => $quoteDto->bookId,
             'user_id' => $quoteDto->userId,
             'content' => $quoteDto->content,
+            'author' => $quoteDto->author,
             'page_number' => $quoteDto->pageNumber,
             'id' => $quoteDto->id,
         ];
@@ -44,7 +45,7 @@ class UpdateQuoteCommand
             throw new \RuntimeException('Quote not found or access denied');
         }
 
-        $quote->updateContent($quoteDto->content, $quoteDto->pageNumber);
+        $quote->updateContent($quoteDto->content, $quoteDto->pageNumber, $quoteDto->author);
         $this->quoteRepository->save($quote);
         return $quote;
     }

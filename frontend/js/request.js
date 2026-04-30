@@ -29,7 +29,6 @@ async function fetchWithAuth(url, options = {}) {
             });
         } catch (err) {
             console.error('Ошибка при обновлении токена', err);
-            alert('Ошибка при обновлении токена \n' + err);
             throw err;
         }
     }

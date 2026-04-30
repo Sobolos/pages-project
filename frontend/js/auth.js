@@ -42,6 +42,11 @@ async function refreshToken() {
     }
 
     const data = await res.json();
+
+    if (data.code === 403) {
+        window.location.href = '/login.html';
+    }
+
     saveTokens(data);
     return data.token;
 }

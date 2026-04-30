@@ -62,7 +62,7 @@ class PdoQuoteRepository extends PdoRepository implements QuoteRepositoryInterfa
 
         if (isset($filters['sort_by'])) {
             $sortField = in_array($filters['sort_by'], ['page_number', 'created_at', 'content']) ? $filters['sort_by'] : 'page_number';
-            $sortOrder = ($filters['sort_order'] ?? 'ASC') === 'DESC' ? 'DESC' : 'ASC';
+            $sortOrder = ($filters['sort_order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
             $query .= " ORDER BY $sortField $sortOrder";
         }
 
@@ -98,14 +98,14 @@ class PdoQuoteRepository extends PdoRepository implements QuoteRepositoryInterfa
             $updateData = array_diff_key($data, ['created_at' => true]);
             $stmt = $this->pdo->prepare(
                 'UPDATE quotes SET book_id = :book_id, user_id = :user_id, content = :content, ' .
-                'page_number = :page_number, updated_at = :updated_at WHERE id = :id'
+                'author = :author, page_number = :page_number, updated_at = :updated_at WHERE id = :id'
             );
             $stmt->execute($updateData);
         } else {
             $insertData = array_diff_key($data, ['id' => true]);
             $stmt = $this->pdo->prepare(
-                'INSERT INTO quotes (book_id, user_id, content, page_number, created_at, updated_at) ' .
-                'VALUES (:book_id, :user_id, :content, :page_number, :created_at, :updated_at)'
+                'INSERT INTO quotes (book_id, user_id, content, author, page_number, created_at, updated_at) ' .
+                'VALUES (:book_id, :user_id, :content, :author, :page_number, :created_at, :updated_at)'
             );
             $stmt->execute($insertData);
             if (!$entity->getId()) {

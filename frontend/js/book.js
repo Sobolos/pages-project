@@ -230,25 +230,31 @@ async function openBookModal(id) {
                 const notesList = document.querySelector('.notes-list');
                 notesList.innerHTML = '';
 
-                if (response.status === 'success' && response.data.length > 0) {
-                    response.data.forEach(note => {
-                        const noteItem = document.createElement('li');
-                        noteItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
-                        noteItem.setAttribute('data-note-id', note.id);
-                        // Используем data-атрибуты вместо onclick
-                        noteItem.innerHTML = `
-                            <div class="note-content">${note.content}</div>
-                            <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn-outline-secondary edit-note-btn" data-note-id="${note.id}">Редактировать</button>
-                                <button type="button" class="btn btn-outline-danger delete-note-btn" data-note-id="${note.id}">Удалить</button>
-                            </div>
-                        `;
-                        notesList.appendChild(noteItem);
-                    });
+                if (response.status === 'success') {
+                    if (response.data.length > 0) {
+                        response.data.forEach(note => {
+                            const noteItem = document.createElement('li');
+                            noteItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+                            noteItem.setAttribute('data-note-id', note.id);
+                            // Используем data-атрибуты вместо onclick
+                            noteItem.innerHTML = `
+                                <div class="note-content">${note.content}</div>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-secondary edit-note-btn" data-note-id="${note.id}">✏️</button>
+                                    <button type="button" class="btn btn-outline-danger delete-note-btn" data-note-id="${note.id}">🗑️</button>
+                                </div>
+                            `;
+                            notesList.appendChild(noteItem);
+                        });
+                    } else {
+                        const emptyItem = document.createElement('li');
+                        emptyItem.classList.add('list-group-item', 'text-center', 'text-muted');
+                        emptyItem.textContent = 'Заметок пока нет';
+                        notesList.appendChild(emptyItem);
+                    }
                 }
             } catch (error) {
                 console.error('Ошибка при загрузке заметок', error);
-                alert('Не удалось загрузить заметки');
             }
         }
 
@@ -261,13 +267,17 @@ async function openBookModal(id) {
             const currentContent = noteContent.textContent;
 
             // Заменяем текст на textarea
-            noteContent.innerHTML = `<textarea class="form-control form-control-sm" id="edit-note-${noteId}" rows="3">${currentContent}</textarea>`;
+            noteItem.classList.remove('d-flex', 'justify-content-between', 'align-items-start');
+            noteItem.classList.add('d-flex', 'flex-column');
+            noteContent.innerHTML = `<div class="w-100"><textarea class="form-control form-control-sm" id="edit-note-${noteId}" rows="3">${currentContent}</textarea></div>`;
 
             // Меняем кнопки на Сохранить и Отмена
             const buttonGroup = noteItem.querySelector('.btn-group');
+            buttonGroup.classList.remove('btn-group');
+            buttonGroup.classList.add('btn-group', 'mt-2');
             buttonGroup.innerHTML = `
-                <button type="button" class="btn btn-outline-primary save-note-btn" data-note-id="${noteId}">Сохранить</button>
-                <button type="button" class="btn btn-outline-secondary cancel-edit-btn" data-note-id="${noteId}">Отмена</button>`;
+                <button type="button" class="btn btn-outline-primary save-note-btn" data-note-id="${noteId}">💾</button>
+                <button type="button" class="btn btn-outline-secondary cancel-edit-btn" data-note-id="${noteId}">🚫</button>`;
         }
 
         // Функция для сохранения заметки
@@ -276,7 +286,6 @@ async function openBookModal(id) {
             const content = textarea.value.trim();
 
             if (!content) {
-                alert('Заметка не может быть пустой');
                 return;
             }
 
@@ -291,7 +300,6 @@ async function openBookModal(id) {
                 loadNotes(); // Перезагружаем список заметок
             } catch (error) {
                 console.error('Ошибка при сохранении заметки', error);
-                alert('Не удалось сохранить заметку');
             }
         }
 
@@ -312,7 +320,6 @@ async function openBookModal(id) {
                 loadNotes(); // Перезагружаем список заметок
             } catch (error) {
                 console.error('Ошибка при удалении заметки', error);
-                alert('Не удалось удалить заметку');
             }
         }
 
@@ -359,7 +366,6 @@ async function openBookModal(id) {
             const content = newNoteTextarea.value.trim();
 
             if (!content) {
-                alert('Введите текст заметки');
                 return;
             }
 
@@ -376,42 +382,47 @@ async function openBookModal(id) {
                 loadNotes(); // Перезагружаем список заметок
             } catch (error) {
                 console.error('Ошибка при создании заметки', error);
-                alert('Не удалось создать заметку');
             }
         });
 
         // Функция для загрузки цитат
         async function loadQuotes() {
             try {
-                const response = await fetchWithAuth(`${API_BASE}/quotes?book_id=${id}`, {
+                const response = await fetchWithAuth(`${API_BASE}/quotes?book_id=${id}&sort_by=created_at`, {
                     method: 'GET'
                 });
 
                 const quotesList = document.querySelector('.quotes-list');
                 quotesList.innerHTML = '';
 
-                if (response.status === 'success' && response.data.length > 0) {
-                    response.data.forEach(quote => {
-                        const quoteItem = document.createElement('li');
-                        quoteItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
-                        quoteItem.setAttribute('data-quote-id', quote.id);
-                        // Используем data-атрибуты вместо onclick
-                        quoteItem.innerHTML = `
-                            <div class="quote-content">
-                                <div>"${quote.content}"</div>
-                                <div class="text-muted small">${quote.page_number} стр., ${quote.author || 'Автор не указан'}</div>
-                            </div>
-                            <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn-outline-secondary edit-quote-btn" data-quote-id="${quote.id}">Редактировать</button>
-                                <button type="button" class="btn btn-outline-danger delete-quote-btn" data-quote-id="${quote.id}">Удалить</button>
-                            </div>
-                        `;
-                        quotesList.appendChild(quoteItem);
-                    });
+                if (response.status === 'success') {
+                    if (response.data.length > 0) {
+                        response.data.forEach(quote => {
+                            const quoteItem = document.createElement('li');
+                            quoteItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+                            quoteItem.setAttribute('data-quote-id', quote.id);
+                            // Используем data-атрибуты вместо onclick
+                            quoteItem.innerHTML = `
+                                <div class="quote-content">
+                                    <div>"${quote.content}"</div>
+                                    <div class="text-muted small">${quote.page_number} стр., ${quote.author || 'Автор не указан'}</div>
+                                </div>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-secondary edit-quote-btn" data-quote-id="${quote.id}">✏️</button>
+                                    <button type="button" class="btn btn-outline-danger delete-quote-btn" data-quote-id="${quote.id}">🗑️</button>
+                                </div>
+                            `;
+                            quotesList.appendChild(quoteItem);
+                        });
+                    } else {
+                        const emptyItem = document.createElement('li');
+                        emptyItem.classList.add('list-group-item', 'text-center', 'text-muted');
+                        emptyItem.textContent = 'Цитат пока нет';
+                        quotesList.appendChild(emptyItem);
+                    }
                 }
             } catch (error) {
                 console.error('Ошибка при загрузке цитат', error);
-                alert('Не удалось загрузить цитаты');
             }
         }
 
@@ -427,23 +438,31 @@ async function openBookModal(id) {
             const page = pageMatch ? pageMatch[1] : '';
             
             // Заменяем текст на форму редактирования
+            quoteItem.classList.remove('d-flex', 'justify-content-between', 'align-items-start');
+            quoteItem.classList.add('d-flex', 'flex-column');
             quoteContent.innerHTML = `
-                <div class="mb-2">
-                    <textarea class="form-control form-control-sm" id="edit-quote-content-${quoteId}" rows="2">${content}</textarea>
-                </div>
-                <div class="mb-2">
-                    <input type="text" class="form-control form-control-sm" id="edit-quote-author-${quoteId}" placeholder="Автор цитаты" value="">
-                </div>
-                <div>
-                    <input type="number" class="form-control form-control-sm" id="edit-quote-page-${quoteId}" placeholder="Номер страницы" value="${page}">
+                <div class="w-100">
+                    <div class="mb-2">
+                        <textarea class="form-control form-control-sm" id="edit-quote-content-${quoteId}" rows="2">${content}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="mb-2 col-md-6">
+                            <input type="text" class="form-control form-control-sm" id="edit-quote-author-${quoteId}" placeholder="Автор цитаты" value="">
+                        </div>
+                        <div class="mb-2 col-md-6">
+                            <input type="number" class="form-control form-control-sm" id="edit-quote-page-${quoteId}" placeholder="Номер страницы" value="${page}">
+                        </div>
+                    </div>
                 </div>
             `;
 
             // Меняем кнопки на Сохранить и Отмена
             const buttonGroup = quoteItem.querySelector('.btn-group');
+            buttonGroup.classList.remove('btn-group');
+            buttonGroup.classList.add('btn-group', 'mt-2');
             buttonGroup.innerHTML = `
-                <button type="button" class="btn btn-outline-primary save-quote-btn" data-quote-id="${quoteId}">Сохранить</button>
-                <button type="button" class="btn btn-outline-secondary cancel-edit-quote-btn" data-quote-id="${quoteId}">Отмена</button>`;
+                <button type="button" class="btn btn-outline-primary save-quote-btn" data-quote-id="${quoteId}">💾</button>
+                <button type="button" class="btn btn-outline-secondary cancel-edit-quote-btn" data-quote-id="${quoteId}">🚫</button>`;
         }
 
         // Функция для сохранения цитаты
@@ -455,31 +474,34 @@ async function openBookModal(id) {
             const content = contentTextarea.value.trim();
             const author = authorInput.value.trim();
             const page = pageInput.value.trim();
+            const bookId = id;
 
             if (!content) {
-                alert('Цитата не может быть пустой');
                 return;
             }
 
             if (!page) {
-                alert('Укажите номер страницы');
                 return;
             }
 
             try {
-                await fetchWithAuth(`${API_BASE}/quotes/${quoteId}`, {
-                    method: 'POST',
+                // Определяем метод запроса: PUT для редактирования, POST для создания
+                const method = quoteId > 0 ? 'PUT' : 'POST';
+                const url = quoteId > 0 ? `${API_BASE}/quotes/${quoteId}` : `${API_BASE}/quotes`;
+                
+                await fetchWithAuth(url, {
+                    method: method,
                     body: JSON.stringify({
                         content: content,
                         page_number: parseInt(page),
-                        author: author
+                        author: author,
+                        book_id: bookId
                     })
                 });
 
                 loadQuotes(); // Перезагружаем список цитат
             } catch (error) {
                 console.error('Ошибка при сохранении цитаты', error);
-                alert('Не удалось сохранить цитату');
             }
         }
 
@@ -500,7 +522,6 @@ async function openBookModal(id) {
                 loadQuotes(); // Перезагружаем список цитат
             } catch (error) {
                 console.error('Ошибка при удалении цитаты', error);
-                alert('Не удалось удалить цитату');
             }
         }
 
@@ -552,12 +573,10 @@ async function openBookModal(id) {
             const page = pageInput.value.trim();
 
             if (!content) {
-                alert('Введите текст цитаты');
                 return;
             }
 
             if (!page) {
-                alert('Укажите номер страницы');
                 return;
             }
 
@@ -578,13 +597,86 @@ async function openBookModal(id) {
                 loadQuotes(); // Перезагружаем список цитат
             } catch (error) {
                 console.error('Ошибка при создании цитаты', error);
-                alert('Не удалось создать цитату');
             }
         });
 
         // Инициализация заметок и цитат
         loadNotes(); // Загружаем заметки при открытии модального окна
         loadQuotes(); // Загружаем цитаты при открытии модального окна
+
+        // Добавляем обработчик изменения файла обложки для немедленной загрузки
+        const coverUploadInput = document.getElementById('book-cover-upload');
+
+        coverUploadInput.addEventListener('change', async function() {
+            if (this.files.length === 0) return;
+
+            const coverFormData = new FormData();
+            coverFormData.append('cover', this.files[0]);
+
+            try {
+                await fetchWithAuth(`${API_BASE}/cover-book/${id}`, {
+                    method: 'POST',
+                    body: coverFormData
+                });
+
+                // Обновляем URL обложки
+                const bookResponse = await fetchWithAuth(`${API_BASE}/book/${id}`, { method: 'GET' });
+                const bookData = bookResponse.data[0];
+                if (bookData.cover_url) {
+                    setBookCover(bookData.cover_url);
+                }
+
+                init();
+
+                // Очищаем input, чтобы можно было загрузить тот же файл снова
+                this.value = '';
+            } catch (error) {
+                console.error('Ошибка при загрузке обложки', error);
+            }
+        });
+
+        // Предотвращаем стандартное поведение перетаскивания на обложку
+        const coverWrapper = document.querySelector('.book-cover-wrapper');
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            coverWrapper.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Добавляем визуальные эффекты при наведении при перетаскивании
+        ['dragenter', 'dragover'].forEach(eventName => {
+            coverWrapper.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            coverWrapper.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            coverWrapper.classList.add('drag-highlight');
+        }
+
+        function unhighlight() {
+            coverWrapper.classList.remove('drag-highlight');
+        }
+
+        // Обработка сброса файла
+        coverWrapper.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                coverUploadInput.files = files;
+                // Имитируем изменение для срабатывания обработчика
+                const event = new Event('change', { bubbles: true });
+                coverUploadInput.dispatchEvent(event);
+            }
+        }
 
         // Удаление предыдущего обработчика, если он существует
         const saveBookButton = document.getElementById('saveBook');
@@ -597,7 +689,6 @@ async function openBookModal(id) {
             const selectedStatus = selectedStatusInput.value ? parseInt(selectedStatusInput.value) : null;
 
             if (!bookTitle) {
-                alert('Название книги обязательно');
                 return;
             }
 
@@ -643,7 +734,7 @@ async function openBookModal(id) {
                     formData.append('cover', fileInput.files[0]);
                 }
 
-                // Сохраняем книгу
+                        // Сохраняем книгу
                 await fetchWithAuth(`${API_BASE}/book-update`, {
                     method: 'POST',
                     body: formData
@@ -655,7 +746,6 @@ async function openBookModal(id) {
                 init();
             } catch (e) {
                 console.error('Ошибка при сохранении книги', e);
-                alert('Не удалось сохранить книгу');
             }
         });
 
@@ -680,7 +770,6 @@ async function openBookModal(id) {
                 
             } catch (error) {
                 console.error('Ошибка при удалении книги', error);
-                alert('Не удалось удалить книгу');
             }
         });
 

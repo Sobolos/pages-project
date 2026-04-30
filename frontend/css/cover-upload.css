@@ -1,0 +1,51 @@
+/* Стили для загрузки обложки книги */
+
+.book-cover-wrapper {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+.book-cover-image {
+    max-height: 250px;
+    object-fit: scale-down;
+    border-radius: 0.25rem;
+}
+
+.cover-overlay {
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+    backdrop-filter: blur(4px); /* Размытие фона */
+    border-radius: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+    text-align: center;
+}
+
+.book-cover-wrapper:hover .cover-overlay {
+    opacity: 1;
+}
+
+.cover-icon {
+    font-size: 2rem;
+}
+
+.cover-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.cover-upload-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Убедимся, что input не мешает отображению */
+.cover-upload-input:focus + .cover-overlay {
+    opacity: 1;
+}

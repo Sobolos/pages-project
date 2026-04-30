@@ -16,7 +16,7 @@ class ProtectedRoutes
         '#^/api/quotes(/.*)?$#',
         '#^/api/settings(/.*)?$#',
         '#^/api/reading-progress(/.*)?$#',
-        '#^/api/books/\d+/cover$#',
+        '#^/api/cover-book/(\d+)#',
         '#^/api/books/\d+/epub$#',
         '#^/api/book-status(/.*)?$#',
         '#^/api/reorder-statuses$#',

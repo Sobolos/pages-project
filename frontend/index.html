@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cover-upload.css">
 </head>
 <body>
 <!-- Header Section -->
@@ -312,93 +313,99 @@
             <div class="modal-body">
                 <div class="book-details row">
                     <div class="col-md-4 book-cover text-center">
-                        <img src="#" alt="Обложка книги" id="book-cover-img" class="img-fluid mb-2" hidden="hidden">
-                        <div id="book-cover-container">
-                            <label for="book-cover-upload" class="form-label">Загрузить обложку</label>
-                            <input type="file" class="form-control" id="book-cover-upload" accept="image/*">
+                        <div class="book-cover-wrapper position-relative">
+                            <img src="#" alt="Обложка книги" id="book-cover-img" class="img-fluid mb-2 book-cover-image" hidden="hidden">
+                            <div class="cover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                <i class="bi bi-pencil-square cover-icon mb-2"></i>
+                                <span class="cover-text">Обновить обложку</span>
+                            </div>
+                            <input type="file" class="cover-upload-input" id="book-cover-upload" accept="image/*">
                         </div>
                     </div>
                     <div class="col-md-8 book-info">
-                        <div class="mb-3 row">
-                            <div class="col-2">
-                                <label for="book-detail-title" class="form-label">Название</label>
-                            </div>
-                            <div class="col-10">
-                                <input type="text" class="form-control" id="book-detail-title" name="book-detail-title">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <div class="col-2">
-                                <label for="book-authors" class="form-label">Авторы</label>
-                            </div>
-                            <div class="col-10">
-                                <div class="custom-multiselect position-relative" id="book-authors">
-                                    <div class="form-control select-display" id="authorSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span class="selected-items">Выберите авторов</span>
-                                    </div>
-                                    <div class="dropdown-menu w-100" id="authorDropdownMenu">
-                                        <div class="d-flex justify-content-end mb-2">
-                                            <button type="button" class="btn btn-outline-secondary btn-sm me-1" id="editAuthorBtn" style="display: none;" onclick="editAuthor()">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" id="deleteAuthorBtn" style="display: none;" onclick="deleteAuthor()">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-                                        <div class="px-2 mb-2">
-                                            <input type="text" class="form-control" id="authorSearchInput" placeholder="Поиск">
-                                        </div>
-                                        <div class="options-list" id="authorOptionsList"></div>
-                                    </div>
-                                    <input type="hidden" name="selectedAuthors" id="selectedAuthors">
+                        <section class="book-parameters add-quote-note-form">
+                            <div class="mb-3 row">
+                                <div class="col-2">
+                                    <label for="book-detail-title" class="form-label">Название</label>
+                                </div>
+                                <div class="col-10">
+                                    <input type="text" class="form-control" id="book-detail-title" name="book-detail-title">
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <div class="col-2">
-                                <label for="book-shelves" class="form-label">Полка</label>
-                            </div>
-                            <div class="col-10">
-                                <div class="custom-multiselect position-relative" id="book-shelves">
-                                    <div class="form-control select-display" id="shelfSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span class="selected-items">Выберите полку</span>
-                                    </div>
-                                    <div class="dropdown-menu w-100" id="shelfDropdownMenu">
-                                        <div class="px-2 mb-2">
-                                            <input type="text" class="form-control" id="shelfSearchInput" placeholder="Поиск">
+                            <div class="mb-3 row">
+                                <div class="col-2">
+                                    <label for="book-authors" class="form-label">Авторы</label>
+                                </div>
+                                <div class="col-10">
+                                    <div class="custom-multiselect position-relative" id="book-authors">
+                                        <div class="form-control select-display" id="authorSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="selected-items">Выберите авторов</span>
                                         </div>
-                                        <div class="options-list" id="shelfOptionsList"></div>
+                                        <div class="dropdown-menu w-100" id="authorDropdownMenu">
+                                            <div class="d-flex justify-content-end mb-2">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm me-1" id="editAuthorBtn" style="display: none;" onclick="editAuthor()">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger btn-sm" id="deleteAuthorBtn" style="display: none;" onclick="deleteAuthor()">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                            <div class="px-2 mb-2">
+                                                <input type="text" class="form-control" id="authorSearchInput" placeholder="Поиск">
+                                            </div>
+                                            <div class="options-list" id="authorOptionsList"></div>
+                                        </div>
+                                        <input type="hidden" name="selectedAuthors" id="selectedAuthors">
                                     </div>
-                                    <input type="hidden" name="selectedShelf" id="selectedShelf">
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <div class="col-2">
-                                <label for="book-statuses" class="form-label">Статус</label>
-                            </div>
-                            <div class="col-10">
-                                <div class="custom-multiselect position-relative" id="book-statuses">
-                                    <div class="form-control select-display" id="statusSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span class="selected-items">Выберите статус...</span>
-                                    </div>
-                                    <div class="dropdown-menu w-100" id="statusDropdownMenu">
-                                        <div class="px-2 mb-2">
-                                            <input type="text" class="form-control" id="statusSearchInput" placeholder="Поиск">
+                            <div class="mb-3 row">
+                                <div class="col-2">
+                                    <label for="book-shelves" class="form-label">Полка</label>
+                                </div>
+                                <div class="col-10">
+                                    <div class="custom-multiselect position-relative" id="book-shelves">
+                                        <div class="form-control select-display" id="shelfSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="selected-items">Выберите полку</span>
                                         </div>
-                                        <div class="options-list" id="statusOptionsList"></div>
+                                        <div class="dropdown-menu w-100" id="shelfDropdownMenu">
+                                            <div class="px-2 mb-2">
+                                                <input type="text" class="form-control" id="shelfSearchInput" placeholder="Поиск">
+                                            </div>
+                                            <div class="options-list" id="shelfOptionsList"></div>
+                                        </div>
+                                        <input type="hidden" name="selectedShelf" id="selectedShelf">
                                     </div>
-                                    <input type="hidden" name="selectedStatus" id="selectedStatus">
                                 </div>
                             </div>
-                        </div>
+                            <div class="mb-3 row">
+                                <div class="col-2">
+                                    <label for="book-statuses" class="form-label">Статус</label>
+                                </div>
+                                <div class="col-10">
+                                    <div class="custom-multiselect position-relative" id="book-statuses">
+                                        <div class="form-control select-display" id="statusSelectDisplay" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="selected-items">Выберите статус...</span>
+                                        </div>
+                                        <div class="dropdown-menu w-100" id="statusDropdownMenu">
+                                            <div class="px-2 mb-2">
+                                                <input type="text" class="form-control" id="statusSearchInput" placeholder="Поиск">
+                                            </div>
+                                            <div class="options-list" id="statusOptionsList"></div>
+                                        </div>
+                                        <input type="hidden" name="selectedStatus" id="selectedStatus">
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
                         <!-- Notes Section -->
                         <section id="notes" class="notes mt-4" aria-label="Заметки">
                             <h3 class="h6 mb-3">Заметки</h3>
                             <ul class="notes-list list-group mb-3" aria-live="polite">
                                 <!-- Dynamic notes will be inserted here -->
                             </ul>
-                            <form action="">
+                            <form action="" class="add-quote-note-form">
                                 <div class="mb-3">
                                     <textarea class="form-control" id="newNote" rows="3" placeholder="Введите текст заметки"></textarea>
                                 </div>
@@ -411,15 +418,17 @@
                             <ul class="quotes-list list-group mb-3" aria-live="polite">
                                 <!-- Dynamic quotes will be inserted here -->
                             </ul>
-                            <form action="">
+                            <form action="" class="add-quote-note-form">
                                 <div class="mb-3">
                                     <textarea class="form-control" id="newQuote" rows="2" placeholder="Введите цитату"></textarea>
                                 </div>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control" id="quoteAuthor" placeholder="Автор цитаты">
-                                </div>
-                                <div class="mb-3">
-                                    <input type="number" class="form-control" id="quotePage" placeholder="Номер страницы">
+                                <div class="mb-3 row">
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" id="quoteAuthor" placeholder="Автор цитаты">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" id="quotePage" placeholder="Номер страницы">
+                                    </div>
                                 </div>
                                 <button type="button" class="btn btn-outline-primary" data-action="add-quote">➕ Добавить</button>
                             </form>

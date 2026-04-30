@@ -10,8 +10,8 @@ class AddResetTokenToUsersTable extends Migration
     {
         $this->pdo->exec("
             ALTER TABLE users 
-            ADD COLUMN reset_token VARCHAR(255) NULL,
-            ADD COLUMN reset_token_expiry TIMESTAMP NULL"
+            ADD COLUMN IF NOT EXISTS reset_token VARCHAR(255) NULL,
+            ADD COLUMN IF NOT EXISTS reset_token_expiry TIMESTAMP NULL"
         );
     }
 
@@ -19,8 +19,8 @@ class AddResetTokenToUsersTable extends Migration
     {
         $this->pdo->exec("
             ALTER TABLE users
-            DROP COLUMN reset_token,
-            DROP COLUMN reset_token_expiry"
+            DROP COLUMN IF EXISTS  reset_token,
+            DROP COLUMN IF EXISTS reset_token_expiry"
         );
     }
 }

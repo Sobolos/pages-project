@@ -89,7 +89,6 @@ function loadBoard(statuses, authors, books) {
         });
     } catch (error) {
         console.error(error);
-        alert('Не удалось загрузить доску');
     }
 }
 
@@ -134,7 +133,6 @@ async function handleDrop(e) {
         if (card) targetColumn.appendChild(card);
     } catch (error) {
         console.error(error);
-        alert('Ошибка перемещения книги');
     }
 
     targetColumn.classList.remove('dropzone-highlight');
@@ -195,10 +193,9 @@ async function handleColumnDrop(e) {
             body: JSON.stringify(updatedPositions)
         });
 
-        init(); // или loadBoard(...) — как у тебя вызывается обновление
+        init();
     } catch (error) {
         console.error(error);
-        alert('Ошибка перемещения колонки');
     }
 
     targetColumn.classList.remove('dropzone-highlight');
@@ -215,7 +212,6 @@ document.getElementById('saveStatusBtn').addEventListener('click', async () => {
     const color = document.getElementById('status-color').value;
 
     if (!name) {
-        alert('Название обязательно');
         return;
     }
 
@@ -247,7 +243,6 @@ document.getElementById('saveStatusBtn').addEventListener('click', async () => {
         init();
     } catch (error) {
         console.error(error);
-        alert('Ошибка сохранения статуса');
     }
 });
 
@@ -312,7 +307,6 @@ async function deleteStatus(statusId) {
         init();
     } catch (error) {
         console.error(error);
-        alert('Ошибка удаления статуса');
     }
 }
 

@@ -32,6 +32,7 @@ class CreateQuoteCommand
             'book_id' => $quoteDto->bookId,
             'user_id' => $quoteDto->userId,
             'content' => $quoteDto->content,
+            'author' => $quoteDto->author,
             'page_number' => $quoteDto->pageNumber,
         ];
 
@@ -51,6 +52,7 @@ class CreateQuoteCommand
             bookId: $quoteDto->bookId,
             userId: $quoteDto->userId,
             content: $quoteDto->content,
+            author: $quoteDto->author,
             pageNumber: $quoteDto->pageNumber,
             createdAt: new \DateTimeImmutable(),
             updatedAt: new \DateTimeImmutable()

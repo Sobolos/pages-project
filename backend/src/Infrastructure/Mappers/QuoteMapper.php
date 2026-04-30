@@ -16,6 +16,7 @@ class QuoteMapper extends BaseMapper
             bookId: (int)$row['book_id'],
             userId: (int)$row['user_id'],
             content: $row['content'],
+            author: $row['author'] ?? null,
             pageNumber: (int)$row['page_number'],
             createdAt: new \DateTimeImmutable($row['created_at']),
             updatedAt: new \DateTimeImmutable($row['updated_at'])
@@ -31,6 +32,7 @@ class QuoteMapper extends BaseMapper
             'book_id' => $quote->getBookId(),
             'user_id' => $quote->getUserId(),
             'content' => $quote->getContent(),
+            'author' => $quote->getAuthor() ?? null,
             'page_number' => $quote->getPageNumber(),
             'created_at' => $quote->getCreatedAt()->format('Y-m-d H:i:s'),
             'updated_at' => $quote->getUpdatedAt()->format('Y-m-d H:i:s'),

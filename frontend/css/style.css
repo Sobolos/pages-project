@@ -180,6 +180,16 @@
     border: 2px solid red;
 }
 
+/* Эффект подсветки при перетаскивании файла */
+.book-cover-wrapper.drag-highlight {
+    transform: scale(1.02);
+}
+
+.book-cover-wrapper.drag-highlight .cover-overlay {
+    opacity: 1;
+    background-color: rgba(0, 123, 255, 0.7); /* Синий полупрозрачный фон при перетаскивании */
+}
+
 
 
 
@@ -291,4 +301,11 @@
 
 .add-diary-modal {
     width: 580px;
+}
+
+.add-quote-note-form {
+    padding: 10px;
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    box-shadow: 6px 6px 8px 0px rgba(34, 60, 80, 0.2);
 }

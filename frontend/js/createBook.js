@@ -188,7 +188,7 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
     const selectedStatusInput = document.getElementById('selectedStatusAdd');
 
     if (!title) {
-        alert('Название обязательно');
+        console.log('Название обязательно');
         return;
     }
 
@@ -223,8 +223,7 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
             });
         }
 
-        //нужно чтобы сначала грузилась книга а потом к ней обложка и епаб
-        const formData = new FormData();
+        // Создаем книгу
         const data = JSON.stringify({
             title: title,
             shelf_id: selectedShelf,
@@ -233,17 +232,26 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
             author_names: [], // Для совместимости
             physical_page_count: 0
         });
-        formData.append('data', data);
-
+        
+        const response = await fetchWithAuth(`${API_BASE}/books`, {
+            method: 'POST',
+            body: JSON.stringify(JSON.parse(data))
+        });
+        
+        // Получаем ID созданной книги
+        const bookId = response.data.id;
+        
+        // Если была выбрана обложка, загружаем её отдельно
         const fileInput = document.getElementById('book-cover');
         if (fileInput && fileInput.files.length > 0) {
-            formData.append('cover', fileInput.files[0]);
+            const coverFormData = new FormData();
+            coverFormData.append('cover', fileInput.files[0]);
+            
+            await fetchWithAuth(`${API_BASE}/cover-book/${bookId}`, {
+                method: 'POST',
+                body: coverFormData
+            });
         }
-
-        await fetchWithAuth(`${API_BASE}/books`, {
-            method: 'POST',
-            body: formData
-        });
         bootstrap.Modal.getInstance(document.getElementById('add-book-modal')).hide();
         init(); // Перезагружаем данные
         newAuthors = []; // Сбрасываем массив новых авторов
@@ -251,7 +259,6 @@ document.getElementById('saveBookBtn').addEventListener('click', async () => {
     } catch (error) {
         selectedAuthors = [];
         console.error('Ошибка создания книги', error);
-        alert('Ошибка создания книги');
     }
 });
 
